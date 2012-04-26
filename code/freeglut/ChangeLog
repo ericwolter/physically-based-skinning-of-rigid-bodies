@@ -1,0 +1,1049 @@
+********** Hey Emacs, please use -*- fundamental -*- mode! **********
+
+Changes to Freeglut:
+
+Before and on October 22, 2002:
+
+(1) Many trivial changes (changing floating-point numbers to integers, for example) to reduce the number of compiler warnings
+
+(2) Removing "strlen" calls from for-loop headers to make things execute ever-so-slightly faster
+
+(3) Slight changes to the "glutSolidSphere" and "glutWireSphere" functions to reduce the number of calls to the sine and cosine functions and otherwise make it slightly more efficient
+
+(4) Added wire and solid torus, wire and solid dodecahedron, wire and solid octahedron, wire and solid tetrahedron, and wire and solid icosahedron
+
+(5) Fixed a bug by which the GLUT menu now draws even when nothing else is happening in the window
+
+(6) Fixed a bug by which freeglut now tracks which window text is being entered into
+
+(7) Added code to adjust for the thickness of the window borders and header bar when resizing and repositioning a window
+
+October 23, 2002:
+
+(8) Added a window destroy callback for freeglut to call the application when a window is closed.  Made freeglut call "exit" if there is no window destroy callback.
+
+October 24, 2002:
+
+(8b)  Also started working on the code to implement the other behaviors when the user clicks on the "x" on the window header bar.
+
+(9) Added the "glutSetOption" function, the "GLUT_ACTION_ON_WINDOW_CLOSE" enumeration, and its allowed values
+
+(10) Added code to check whether a window is a subwindow in the reposition and reshape functions.  If it is a subwindow, do not adjust the position and size for the window border.
+
+(11) Added code to fix the drawing of subwindows inside of windows.  The Windows implementation uses "GetWindowRect" which uses coordinates relative to the screen corner, not the parent window corner.
+
+(12) Modified the code to open a window so that the freeglut window now matches the GLUT window.
+
+(13) Added an ugly hack to the main loop function to call each window's visibility callback before jumping into the main loop.  This fixes the behaviour of several of the demo programs.
+
+
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/24/02.
+*******************************************************************************************
+
+(14) Reworked the "freeglut_font.c" file pretty thoroughly to speed things up a bit, to add the "glutStrokeString" function, and to make the "glutStrokeLength" function return an accurate value for long strings.  Also allowed the string functions to handle character strings containing carriage returns.
+
+(15) Moved the "fgState" structure initialization in "freeglut_init.c" out of "fgInitialize" to set them at compile time.  Also added it to "fgDeinitialize" to reset the state.
+
+(16) Recoded a bit in "glutInit" to speed things up slightly
+
+(17) Added "#pragma warning ( once: 4305 )" directives to the stroke font files so that I don't get 4000 compiler warnings about assigning double precision constants to single precision variables
+
+(18) Added a state enumeration (initializing, running, stopping) and flag to the "fgState" structure.  Modified the window closure and main loop code to use the enumeration instead of local variables.
+
+(19) Fixed the "glutPositionWindow" so that if you get and retrieve the window position twenty times in a row the window won't slide down the screen.
+
+(20) Recoded the "glut*Cone" functions so that they have normals on the curved surface and so that the "base" argument is really the radius of the base of the cone.
+
+(21) Added code to render a rhombic dodecahedron in the geometry library.
+
+(22) Started work on a "glutInitDisplayString" function.  I have provided a framework; I will need some serious help in interpreting the results.
+
+(23) Modified the "fgDisplayMenu" so that the matrix mode is GL_MODELVIEW instead of GL_PROJECTION when execution returns to its calling function.  I have no idea why, but this fixes some display problems in some of the demos.  Part (or all) of the display was blanking out when the user brought up a menu.
+
+(24) Added four "pragma comment" lines to "freeglut.h" so that freeglut will automatically (under Windows) include "winmm.lib", "opengl32.lib", "glu32.lib", and "freeglut.lib".  This way the application doesn't have to do this by hand.
+
+(25) Fixed the window positioning code so that if the border is going to extend above the top of the screen, it gets set to the top of the screen.
+
+(26) Added right-arrows to menu entries which have submenus.  Also modified the submenu position so that it comes down to the right or to the left of the parent menu.
+
+(27) Recoded a good bit of the menu processing to make the menus behave more like GLUT menus.
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/31/02.  Also posted these on the reflector.
+*******************************************************************************************
+
+(28) Added parentheses to the Windows version of setting the "State.Modifiers" to allow for precedence of operators.  Also modified the code so that it follows the "getKeyState" return value specification.
+
+(29) Made the window event handler check for the existence of a window for all messages except the "create" message
+
+(30) Changed the order of events in the window closure function so that the window would still be in the windows structure when the closure message to Windows was sent.
+
+(31) Made some more changes to the window closure code so that it works from both clicking on the "x" and from a "glutDestroyWindow" call
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/31/02 as an update.  Also posted these on the reflector.
+*******************************************************************************************
+
+(32) Added "glutLeaveMainLoop" function.
+
+(33) Added "glutMainLoopEvent" function.  This processes a single iteration through the "glutMainLoop" and is (theoretically) usable for re-entrant GLUT code.
+
+(34) Implemented the "WM_KEYUP" and "WM_SPECIALKEYUP" callbacks in the Windows version.
+
+(35) Added normals to the "glutWireCube" function
+
+(36) Recoded "glutGetExtension" to remove a <Steve, cover your eyes> "goto" statement </Steve, cover your eyes> from the code.
+
+(37) Marked the "glutSetKeyRepeat" function as deprecated.
+
+(38) Implemented most of the Windows version of the "fghGetConfig" function.
+
+*******************************************************************************************
+* Took up the project again November 19.
+*******************************************************************************************
+
+(39) Added two missing characters to each of the bitmapped fonts.
+
+(40) Added "glutSierpinskiSponge" to the geometry file.  I can take it out if people object.
+
+(41) Added a linked list of windows to close so that if you destroy a window from within its callback the program won't terminate on error.
+
+(42) Added a call to "free" in the joystick code so we wouldn't have a memory leak.  Also fixed another memory leak.
+
+(43) Fixed the bitmapped Helvetica 12 and Helvetica 18 fonts so they now match the GLUT fonts.
+
+*******************************************************************************************
+* Sent the files to Don Heyse on November 27 for inclusion in CVS.
+*******************************************************************************************
+
+(44) Fixed the other bitmapped fonts so they now match the GLUT fonts.  There are some differences in the placement of the bit patterns within the characters, but the greatest difference is only a pixel or two.
+
+(45) Added DLL capability.  Changed the names of the outputs so that the static library is "freeglut_static.lib" and the names of the DLL file and its interface file are "freeglut.dll" and "freeglut.lib".
+
+(46) Moved the "freeglut_internal.h" file from the public include directory to the private source code directory.
+
+(47) Split the "freeglut.h" file into a "glut.h" file that is compatible with GLUT and a "freeglut_ext.h" file that contains the new extensions.
+
+*******************************************************************************************
+* Changes starting in May 2003
+*******************************************************************************************
+
+(48) Changed "freeglut_main.c" to allow the Windows version to pass the mouse position to the keystroke callbacks
+
+(49) Changed "freeglut_main.c" in the Unix section to move the call to find the event's window to before the "switch" statement.
+
+(50) Changed "freeglut_main.c" in the Unix section to modify the window closure sequence of events slightly.
+
+(51) Changed "freeglut_state.c" so the "glutGet" calls with window position and size don't move the windows down and to the right one pixel.
+
+(52) Implement single-buffered rendering (or its emulation) in Windows.
+
+(53) Implement Eero Pajarre's "GLUT_ICON" code.
+
+(54) Fixes for the window positioning problem.
+
+(55) Fixed a couple of compiler warnings and other bugs. Changed "freeglut_main.c" to remove a compiler warning. Changed "freeglut_structure.c" to set the current window before calling the window closure callback.
+
+
+*******************************************************************************************
+* Changes on 17-19 June 2003
+*******************************************************************************************
+
+(56) Added glutGetProcAddress()
+
+(57) Added GLUT_FPS env var.
+
+(58) Implemented Aleksandar Donev's user data changes:  added user data fields to window and menu structures and implemented functions to get and set them
+
+(59) Added a "MenuDestroy" callback which sets a function that "freeglut" calls when a menu is destroyed.
+
+
+
+*******************************************************************************************
+* Changes on 20 June 2003
+*******************************************************************************************
+
+(60) Added autogen.sh (#30 from todo.txt)
+
+(70) Updated aclocal.m4 with aclocal 1.7.3 (was created with aclocal 1.5)
+
+(71) Changed all references to the 'freeglut-1.3' directory to 'src', copied 'freeglut-1.3' to 'src' and added all files to the repository (TODO #34).
+
+
+*******************************************************************************************
+* Changes on 24 June 2003
+*******************************************************************************************
+
+(80) Fixed autogen.sh and removed aclocal.m4
+
+(81) Added 'freeglut.kdevelop' (Gideon [Kdevelop 3.0]) project file
+
+
+*******************************************************************************************
+* Changes on 24 June 2003
+*******************************************************************************************
+
+(82) Added 'freeglut_ext.c' to the project files 'freeglut.dsp' and 'freeglut_static.dsp' (New list #10)
+
+
+*******************************************************************************************
+* Changes on 27 June 2003
+*******************************************************************************************
+
+(83) Now installs freeglut_ext.h and glut.h to /usr/include/GL (was missing before)
+
+
+*******************************************************************************************
+* Changes on 01 July 2003
+*******************************************************************************************
+
+(84) Fixed the 'ptr + len' problem in freeglut_misc.c:90
+
+
+*******************************************************************************************
+* Changes on 02 July 2003
+*******************************************************************************************
+
+(85) Removed genfonts/genstrokes code, updated configure.in and Makefile.in
+
+(86) Moved tests/one.c into progs/demos/One/one.c, updated configure.in and Makefile.in
+
+(87) Removed tests directory
+
+
+*******************************************************************************************
+* Changes on 03 July 2003
+*******************************************************************************************
+
+(88) Removed unused char *ptr from freeglut_misc.c
+
+*******************************************************************************************
+* Changes on 17 July 2003
+*******************************************************************************************
+
+(89) Changed the overlay (freeglut_state.c:662) to return FALSE, as it's not implemented yet.
+
+(90) Applied John F. Fay's fixes to freeglut.dsp and freeglut_static.dsp
+
+
+*******************************************************************************************
+* Changes on 21 July 2003
+*******************************************************************************************
+
+(91) src/Makefile.am:38  Changed versioning to 11:0:8 thanks to Bernhard Kaindl
+
+
+*******************************************************************************************
+* Changes on 22 July 2003
+*******************************************************************************************
+
+(92) freeglut.lsm:3  Removed 'beta' label for next release, thanks to Bernhard Kaindl.
+
+
+*******************************************************************************************
+* Changes on 23 July 2003
+*******************************************************************************************
+
+(93) doc/Makefile.am:4  Removed trailing backslash and added an empty last line
+
+(94) src/freeglut_window.c  Windowing fixes from John F.
+
+
+*******************************************************************************************
+* Changes on 23 July 2003
+*******************************************************************************************
+
+(95) src/freeglut_initial.c:91  Added check for SOLARIS OS (Dave Reed)
+
+(96) src/freeglut_window.c:551  Removed extra carriage return for Windows users (John F. Fay)
+
+
+*******************************************************************************************
+* Changes on 05 August 2003
+*******************************************************************************************
+
+(97) src/freeglut_main.c:816 and :1571, set the current window (John F. Fay)
+
+(98) src/Makefile.am:34 Added mwmborder.c
+
+(99) src/freeglut_window.c:67  Removed #included "mwmborder.c"
+
+*******************************************************************************************
+* Changes on 10 August 2003
+*******************************************************************************************
+
+(100) GameMode fixes: src/freeglut_gamemode.c src/freeglut_internal.h src/freeglut_window.c
+
+  src/freeglut_gamemode.c:
+     fghRememberState():     remember original XFree86 ViewPort
+     fghRememberState():     remember original pointer position
+     fghRestoreState():      restore  original pointer position
+     fghRestoreState():      restore  original XFree86 ViewPort
+     fghChangeDisplayMode(): fix glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)
+     fghChangeDisplayMode(): remove superflous attempt to change ViewPort
+     glutEnterGameMode():    move special XMoveWindow() from generic code here
+     glutEnterGameMode():    call XSync() to avoid races with XPointer calls
+     glutEnterGameMode():    call to XWarpPointer() to ensure that the pointer is grabbed
+     glutEnterGameMode():    wait until window is viewable to avoid exit on XSetInputFocus
+     glutEnterGameMode():    move decorations away to fix fullscreen w/ max resolution
+
+  src/freeglut_internal.h:
+     struct tagSFG_Display:  add fields for saving viewport and pointer position
+
+  src/freeglut_window.c:
+     fgOpenWindow():         remove obsolete special case for GameModeEnter()
+
+*******************************************************************************************
+* Changes up to September 12, 2003
+*******************************************************************************************
+
+(101) Include files:  Underscores added to the defined constants which prevent multiple inclusions
+
+(102) String functions:  Arguments changed from "char *" to "unsigned char *" for compatibility with GLUT
+
+(103) Added several explicit type casts to allow compilation with "Dev C++" compiler
+
+(104) Quite a bit of debugging of the menus in their menu windows
+
+(105) Removed "glib" dependency from joystick code; now it compiles under FreeBSD
+
+(106) Removed the "fgCleanUpGlutsMess" function because it was redundant
+
+
+*******************************************************************************************
+* Changes on September 13, 2003
+*******************************************************************************************
+
+(107) Repaired DOS line endings in the MSVC project and workspace files
+
+(108) Fixed some relative paths in the MSVC demo project files
+
+(109) Fixed all the demo makefiles to ensure they compiled properly; included minor changes to some of the sources.
+
+(110) Fixed compiliation of freeglut_joystick.c on FreeBSD
+
+*******************************************************************************************
+* Changes through September 24, 2003
+*******************************************************************************************
+
+(111) Fixed busy-wait bug in freeglut; now sleeps when there's nothing to do.
+
+(112) GLUT_SINGLE properly supported.
+
+(113) progs/demos/Fractals_random works.
+
+*******************************************************************************************
+* Freeglut 2.0.0 Released on  September 29, 2003!
+*******************************************************************************************
+
+*******************************************************************************************
+* Changes on October 1, 2003
+*******************************************************************************************
+
+(114) Support for more than 3 mouse-buttons (this allows 3+scroll-wheel to
+workin X, for example).
+
+(115) Added 3rd party patch to make joystick code work on NetBSD (untested)
+and on older versions of FreeBSD (also untested)
+
+*******************************************************************************************
+* Changes on October 3, 2003
+*******************************************************************************************
+
+(116) Tweaking for the menu behavior on Linux regarding mice, etc. - John Fay
+
+*******************************************************************************************
+* Changes on October 6, 2003
+*******************************************************************************************
+
+(117) freeglut_menu.c:328 Fix submenu triangle (John Fay)
+
+*******************************************************************************************
+* Changes on October 8, 2003
+*******************************************************************************************
+
+(118) freeglut_menu.c:217,519,532: Fix menus to stay in the window (John Fay)
+
+(119) Fixed menu callbacks to set the current window.
+
+(120) Numerous GLUT-alikeness corrections made to the menus (UNIX_X11
+freeglut menus now look more like old UNIX/X11 GLUT menus).  Placement
+and highlighting of menus is greatly improved as well, and (at least
+at compile-time) it is now easy to change fonts and colors for menus.
+
+(121) Fixed CreateNotify on X11 to act like ConfigureNotify.  This
+helps subwindows in freeglut behave more like top-level windows.  (In
+old GLUT, they behaved essentially the same, so we try to reproduce
+that here.)
+
+*******************************************************************************************
+* Changes on October 9, 2003
+*******************************************************************************************
+
+(122) Minor glutInit*() quibbles in some of the demos.  Also applied a
+change from John so that the affine-transform demos would work even if
+they couldn't find their default set of transforms or the one named on
+the command-line (a simpler one than even the default is built in).
+
+*******************************************************************************************
+* Changes on October 11, 2003
+*******************************************************************************************
+
+(123) Disallow people to pass NULL in for glutDisplayFunc().
+
+(124) More menu fixes from John.
+
+(125) Check the memory allocation of timers.
+
+(126) Some code style/readability issues.
+
+*******************************************************************************************
+* Changes on October 11, 2003
+*******************************************************************************************
+
+(127) Fleshed out all missing cursor types on NetBSD (UNIX_X11) for the
+glutSetCursor() call.  GLUT_CURSOR_NONE still required work.  Fixes
+included: Adding numerous types required by GLUT but previously missing
+in freeglut, reversing the left/right glyphs, and some just-plain-wrong
+glyphs corrected.
+
+*******************************************************************************************
+* Changes on October 13, 2003
+*******************************************************************************************
+
+(128) Removed obsolete hack (or ill-conceived dream) of fgDisplayCursor().
+
+(129) Modified the the fractal demos so that they don't clear/redraw quite
+so often.
+
+(129) Code readability/style issues.
+
+*******************************************************************************************
+* Changes on October 14, 2003
+*******************************************************************************************
+
+(130) More style issues.
+
+*******************************************************************************************
+* Freeglut 2.0.1 Released on 23 October, 2003!
+*******************************************************************************************
+
+*******************************************************************************************
+* Changes on October 26, 2003
+*******************************************************************************************
+
+(131) Made freeglut know the program's name (fetch from main()'s argv[0]).
+
+(132) Moved idle callback out of glutMainLoopEvent().
+
+(133) Committed Nigel's fix to make the joystick set the current window before
+invoking the callback.  (Completes the closeout of an open bug report,
+once verified.)
+
+(134) Added some error-checking of memory allocations.
+
+(135) More style issues.
+
+*******************************************************************************************
+* Changes on October 27, 2003
+*******************************************************************************************
+
+(136) Partially unified the UNIX_X11 and WIN32 branches of glutMainLoopEvent()
+
+(137) Updated comments, other style issues.  Check for some NULL pointers.
+
+*******************************************************************************************
+* Changes on October 28, 2003
+*******************************************************************************************
+
+(138) More style issues.
+
+(139) Mouse-wheel support added for WIN32.  API extension generally
+added to freeglut.
+
+*******************************************************************************************
+* Changes on October 29, 2003
+*******************************************************************************************
+
+(140) Fixed a bug in fgWarning()/fgError().  Added range-check to
+glutSetKeyRepeat().
+
+(141) More style issues.
+
+(142) Removed bogus references to "Linux" in freeglut_state.c.
+The references should have properly been to UNIX and/or X11.  GNU/LINUX
+emulates UNIX, and X11 is the windowing system that runs on most graphics-
+capable UNIX systems (including most GNU/LINUX systems).  freeglut should
+run on any sufficiently UNIX-like system with OpenGL and X11 (or at least
+XFree86's implementation of X11).
+
+(143) #include <sys/param.h> on the BSDs so that we can check the system
+version number at compile-time.
+
+*******************************************************************************************
+* Changes on October 30, 2003
+*******************************************************************************************
+
+(144) Numerous small fixes w.r.t. mouse-wheels on WIN32.
+
+(145) More style issues.
+
+*******************************************************************************************
+* Changes on October 31, 2003
+*******************************************************************************************
+
+(146) More style issues.
+
+(147) Converted an error-check from an assert() to an if().
+
+(148) Removal of the last ASCII TAB character from src/* files.  This
+conversion process ensures that the formatting appears more consistant
+for everyone.  (TABs can vary in their expansion from one system to
+another).
+
+*******************************************************************************************
+* Changes on November 3, 2003
+*******************************************************************************************
+
+(149) X11 mousewheel fixes.
+
+(150) Yet more style issues.
+
+(151) Added a case for {MapNotify} events in X11.
+
+(152) Re-(?)deleted 3 files from CVS, per John's request.  These were
+obsolete: freeglut13.dsp, freeglutdll.dsp, freeglutstatic.dsw
+
+(153) Marked a few pointer/int conversion warnings.  (I think that they
+only manifest for me on my AMD64 system, but they seem fairly harmless
+so I didn't try to fix them.)
+
+(154) Memory-leak fix from John.
+
+*******************************************************************************************
+* Changes on Novembber 4, 2003
+*******************************************************************************************
+
+(155) More style issues.
+
+(156) Removed G_LOG_DOMAIN junk, per mailing list discussion.
+
+(157) Added memory-leak detection support (WIN32) to a couple of the
+demos, and fixed at least one memory leak in the process.  Also
+converted Fractals_random to double-precision to avoid some compiler
+warnings.
+
+(158) Stripped CRs from fractals_random.c.
+
+(159) Fixed two bugs: Execution state was improperly set in the end
+of glutMainLoop(), and {ButtonPress} (an X11 constant) was used where
+the flag-variable {pressed} (in UNIX_X11 branch of glutMainLoop())
+should have been used.
+
+(160) Pointer-check before deallocation in the menu code.
+
+*******************************************************************************************
+* Changes on November 5, 2003
+*******************************************************************************************
+
+Remember, remember,
+the 5th of November.
+Gunpowder, treason and plot!   (Bacon?)
+
+I see no reason
+why gunpowder treason
+should ever be forgot.         (Shakespeare?)
+
+*******************************************************************************************
+* Changes on November 6, 2003
+*******************************************************************************************
+
+(161) Fractals_random demo now includes mouse support---including mouse-
+wheel.
+
+(162) Yet more fixes to the mouse wheel support in WIN32.
+
+(163) Converted freeglut to use an array to store window callbacks,
+rather than a struct.  This lets us loop over the array to fill it with
+NULL pointers in order to clear the callbacks.  (With a struct, we were
+reduced to either a ton of assignments---easy to miss one!---or memset(),
+which technically is not a legal way to fill a region with NULL pointers
+because the bit-pattern of a NULL pointer is not necessarily defined to
+be all-zero bits.)  This change also on the one hand provides macros
+to simplify most proper use of the callbacks (even simpler than with
+the struct form), while also making it irritating enough to bypass the
+macros that (it is hoped) abuse will be harder.  (E.g., the invocation
+macros set the current-window.  At least two bugs in the past occurred
+because callbacks were not setting the current window before invoking the
+client.)  See 
+https://sourceforge.net/mailarchive/message.php?msg_id=6467923 for more
+details.
+
+(164) Yet more style issues.  (You thought I'd forgotten about that?)
+
+*******************************************************************************************
+* Changes on November 7, 2003
+*******************************************************************************************
+
+(165) Mouse-wheel corrections in X11.
+
+(166) Style corrections.
+
+(167) Fixed GLUT_CURSOR_NONE support at long last in NetBSD.  (Should also
+apply to other X11 based systems, but I can only test NetBSD.)  Also
+deallocated some resources that glutSetCursor() was allocating in the
+X server.
+
+(168) Added {ReparentNotify} (event type 21) case to glutMainLoop().
+
+(169) Clear window callbacks during window destruction.
+
+(170) Implement visible/invisible support for WIN32.  (Partial?  No
+callback added at this time.)
+
+*******************************************************************************************
+* Changes on November 8, 2003
+*******************************************************************************************
+
+(171) Altered the way that {random} was chosen in the fractals_random.c
+program, in order to attempt to gain a longer cycle before repeating.
+
+(172) More style issues.
+
+*******************************************************************************************
+* Changes on November 9, 2003
+*******************************************************************************************
+
+(173) Added some error-checking to the glutSetCursor() code on my
+NetBSD (UNIX_X11) system.
+
+*******************************************************************************************
+* Changes on November 10, 2003
+*******************************************************************************************
+
+(174) Reversed the Fractals_random changes; they were bogus since they
+assumed that there were always exactly 4 affine transforms to choose
+from (which is certainly not guaranteed!).  Back to just shifting by
+10 bits and going modulo the number of transforms.
+
+*******************************************************************************************
+* Changes on November 11, 2003
+*******************************************************************************************
+
+(175) Retroactively updated the ChangeLog file for all of the commits by
+myself (rkrolib; a.k.a. Richard Rauch) (at least as visible via on the
+SourceForge "CVS message board"), summarzing changes for the sake of those
+who lack both web-browser and CVS access.  Also fixed a numbering error in
+the log where there were two "(110)" events.  (Plus added (174) from
+November 10th by memory.)
+
+(176) Style cleanup to the "one" demo.  (Removal of CRs, TABs, mostly.)
+
+(177) Changed the "one" demo to do glutInit*() calls before glutInit(),
+proper.  This allows command-line parameters to override built-in
+behavior.
+
+(178) Complete purge of all remaining TABs from freeglut's *.[ch] files.
+Also verified that (as far as I can tell) all CRs are removed from all
+files where they do not belong.
+	
+*******************************************************************************************
+* Freeglut 2.2.0 RC 1 Released on  December 10, 2003!
+*******************************************************************************************
+
+(179) CallbackMaker.dsp, demos.dsw, shapes.dsp all updated and are
+packaged with distributions
+
+(180) Fix for the window sizes on Win32 (Nigel Stewart)
+
+(181) Disable/enable lighting in the "one.c" demo (John Fay)
+
+*******************************************************************************************
+* Freeglut 2.2.0 RC 2 Released on  December 11, 2003!
+*******************************************************************************************
+
+*******************************************************************************************
+* Freeglut 2.2.0 Released on  December 12, 2003!
+*******************************************************************************************
+
+
+***************************************************************************
+* Changes on February 5, 2004.
+***************************************************************************
+
+(182) With permission from Steve Baker, John Fay imported the latest joystick
+code from PLIB into freeglut.  This is expected to provide better support
+joysticks such as USB joysticks.  However, it is largely untested beyond
+compiling, and likely will require some debugging.
+
+	
+***************************************************************************
+* Changes on February 7, 2004.
+***************************************************************************
+
+(183) Richard Rauch added experimental support for a new feature:
+GLUT_OFFSCREEN as a rendering mode (as proposed by Nigel Stewart).
+The intent is that you specify GLUT_OFFSCREEN as a GLUT display mode,
+and then open a "window" much as you would a regular top-level window.
+Only UNIX_X11 is supprted at this point, for lack of knowledge.
+
+*********************************
+* March 8, 2004.
+*********************************
+
+(184) Made the include path for "freeglut.h" global (in "<>") rather
+than local (in quotes).
+
+*********************************
+* March 14, 2004.
+*********************************
+
+(185) Stripped out tab characters and end-of-line whitespace.
+
+*********************************
+* Ides of March, 2004.
+*********************************
+
+(186) Per demands of project owner, offscreen rendering is now removed
+from freeglut.
+
+(187) Added support for Windows CE.
+
+*********************************
+* March 17, 2004.
+*********************************
+
+(188) Fixed an array-bounds error in X11 key-repeat detection
+
+*********************************
+* May 12, 2004.
+*********************************
+
+(189) Fixed a bug in direct/indirect rendering context and generally made
+it rational.
+
+(190) Created "GLUT_XLIB_IMPLEMENTATION" defined constant
+
+(191) Removed a false deprecation message of "glutSetKeyRepeat" function
+
+(192) Implemented the upper-end ASCII characters and allowed for rotation
+of bitmapped text.
+
+(193) Removed some obsolete defined constants.
+
+(194) Fixed a bug in the "behaviour on window close" code.
+
+(195) Added some comments about Windows window events.
+
+(196) Implemented the GLUT teapot in Windows CE.
+
+*********************************
+* June 29, 2004.
+*********************************
+
+(197) Gave menu windows the name "freeglut menu" instead of NULL
+
+*********************************
+* August 4, 2004.
+*********************************
+
+(198) Fixed a bug in "glutBitmapString" so that it handles end-of-line
+characters correctly.
+
+*********************************
+* August 5, 2004.
+*********************************
+
+(199) Suppressed warnings about indirect rendering contexts for BSD per
+request from Richard Rauch.
+
+*********************************
+* August 11, 2004.
+*********************************
+
+(200) Fixed a very nasty game mode bug that was causing crashes with the
+screen in a changed (low) resolution.
+
+*********************************
+* September 10, 2004.
+*********************************
+
+(201) Modified the joystick initialization so that it only happens if the
+application defines a joystick callback.
+
+(202) Changed many three-line comments to single-line comments.
+
+*********************************
+* September 13, 2004.
+*********************************
+
+(203) Removed redundant end-of-line characters from error and warning
+messages.
+
+(204) Renamed "fgGetCursorError" and made it and some other functions static.
+
+(205) Added a warning message to game mode get function.
+
+*********************************
+* September 15, 2004.
+*********************************
+
+(206) Fixed a bug in the command line argument compaction code.
+
+*********************************
+* September 23, 2004.
+*********************************
+
+(207) Changed "fgError" calls in the font routines to "fgWarning" so that
+execution can continue even if text does not get printed.
+
+(208) Made the geometry functions more robust in case the application calls
+them with bad inputs (like zero layers in a cone).
+
+(209) Unified the tetrahedron and Sierpinski sponge code.
+
+(210) Made the Key Repeat default behaviour consistent between initialization
+and reinitialization.
+
+(211) Removed duplicate nested parentheses.
+
+(212) Changed some "window by handle" internal functions to receive the window
+pointer instead of looking up the window pointer right away.
+
+(213) Removed some redundant window resize code.
+
+*********************************
+* October 5, 2004.
+*********************************
+
+(214) Added British spellings to the display mode string processing.
+
+(215) Modified the mouse behaviour in Windows to match the X11 behaviour.  It's
+not perfect but it is much improved.  The question of multiple button presses
+at once remains.
+
+*********************************
+* October 6, 2004.
+*********************************
+
+(216) Moved the joystick initialization code to one function.
+
+(217) Added some functions to get joystick parameters (number of buttons, axes).
+It is not clear whether these should go into the API or not.
+
+*********************************
+* December 17, 2004.
+*********************************
+
+(218) Changed the "freeglut_assert_window" to "fgError" and had it print out
+the name of the function whose call created the error condition.
+
+(219) Changed the "freeglut_assert_ready" to "fgError" when it is invoked in
+an API function and had it print out the name of the function whose call
+created the error condition.  Removed some other "freeglut_assert_ready"
+invocations from functions which are only called from other functions which
+already check for initialization.
+
+***************************************************************************
+* Changes on December 31, 2004.
+***************************************************************************
+
+(220) Fixed bug #1079530 (glutGetProcAddress and geometric objects).
+
+(221) Fixed bug #1087642 (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT)
+unimplemented).
+
+(222) Fixed bug #1045054 (KeyReleaseMask typo).
+
+(223) Fixed bug #1040435 (glutBitmapString() bug).
+
+(224) Fixed first bug of #1064195 (two things when using signals):
+Don't issue a warning about select when a non-blocked signal was
+caught. This makes sense and is more compatible with GLUT.
+
+***************************************************************************
+* Changes on January 1, 2005.
+***************************************************************************
+
+(225) Added eMbedded Visual Tools project/workspace files to
+distribution.
+
+(226) Renamed "configure.in" to the officially preferred
+"configure.ac".
+
+(227) Make "gcc -Wall -pedantic -Werror" happy.
+
+(228) Modernized configure.ac a bit and added a rule to Makefile.am to
+update libtool. Note that all gcc compiler warnings are now on by
+default.
+
+(229) Added missing files from "src" subdirectory to dist.
+
+***************************************************************************
+* Changes on January 3, 2005.
+***************************************************************************
+
+(230) Removed acconfig.h, it is deprecated and we don't need it.
+
+(231) Cleaned up and autoconf'd the header inclusion story a bit.
+
+(232) Improved error message a bit when no suitable visual could be found
+(X11 only).
+
+(233) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen), i.e. memory leak caused by not freeing the mode lines returned
+by XF86VidModeGetAllModeLines
+
+(234) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen): Now we first try to get an exact mode match, ignoring the
+refresh rate if none could be found. This way the X11 part and the WinDoze
+behave similarly. NOTE: We still don't behave like GLUT, because it has a
+wider notion of "best" match. We have to refactor and extend freeglut quite
+a bit to do that.
+
+(235) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen), i.e. issue warnings when XF86VidModeFOO fails.
+
+(236) Reworked the X11 part of glutSetCursor, fixing bug #764187 (Variable
+mouse pointers don't work) on the way:
+   * Use slightly more compatible cursor shapes for GLUT_CURSOR_RIGHT_ARROW
+     and GLUT_CURSOR_LEFT_ARROW.
+   * Refactored and fixed the erroneous code for GLUT_CURSOR_NONE.
+   * Removed the incorrect use of XFreeCursor and use a cache of cursors
+     instead. Cursors are never freed now, we could do this e.g. via
+     reference countig if this is really needed.
+   * Fixed error handling.
+   * Unknown cursor types are an error now.
+   * Now the window state always corresponds to the wanted cursorID, even in
+     the case of GLUT_CURSOR_FULL_CROSSHAIR.
+
+**************************************************************************
+* Changes between January 3 and April 15, 2005.
+**************************************************************************
+(237) Moved the "#include "config.h"" statement to the header file
+
+(238) Changed the "assert" checks to more dignified statements that print
+      useful error messages before exiting.  Also added initialization
+      checking to all GLUT interface functions.
+
+(239) Changed some menu code around to remove duplicate code.
+
+(240) Implemented the ability to attach a menu to multiple windows.
+
+(241) Implemented the "GLUT_AUXn" color buffers for X11 and Windows
+
+(242) Improved the cursor handling marginally; also removed some duplicate
+      cursor code
+
+**************************************************************************
+* Changes on April 15, 2005.
+**************************************************************************
+(243) Changed some comments in "freeglut_internal.h" as a test for the new
+      pCVSc project.
+
+(244) Changed the names of the "fgStructure.Window" and ".Menu" variables
+      to ".CurrentWindow" and ".CurrentMenu" to make maintenance easier.
+
+(245) Tried implementing Yuri D'Elia's game mode changes.
+
+**************************************************************************
+* Changes in late April 2005
+**************************************************************************
+(246) Added French version of README (called LISEZ-MOI") and a Windows-specific
+      version of README describing how to operate under MSVC
+
+(247) Changed definitions of "FETCH_WCB" and "INVOKE_WCB" to allow compilation
+      with GCC 4.0
+
+(248) Changed the Makefile path to the "include" directory to allow for
+      off-directory compilation
+
+(249) Added some initializations and changed a hard-coded number of mouse
+      buttons to a defined constant
+
+(250) Added code to the Windows timing to allow for millisecond granularity
+      in the execution time
+
+(251) Fixed a reported bug in the fullscreen mode
+
+(252) Added window exit event handling to the Windows code; also put in a note
+      about adding window entry event handling
+
+**************************************************************************
+* Changes in early May 2005 -- in the run-up to 2.4.0
+**************************************************************************
+(253) Added handling for negative position specifications for subwindows
+
+(254) Made the display string handling in "freeglut_init.c" ever so slightly
+      more general
+
+(255) Changed the key repeat flag initialization from "GL_TRUE" to
+      "GLUT_KEY_REPEAT_ON" to make it consistent with its use elsewhere.
+
+(256) Removed the unused joystick function "fghJoystickParseElement"
+
+(257) Added a comment to "glutCreateWindow" about why "freeglut" does not
+      match GLUT when "glutInit" is not called.
+
+(258) Removed an unused "Pixmap" variable
+
+(259) Changed the "shapes" demo to the OpenGLUT "shapes" demo, which is much
+      niftier.
+
+(260) Necessary compilation fixes for newer GCCs (e.g. 3.3.5, 4.0).
+      Side effect: The shapes demo has a new 'i' key now.
+
+(261) Fixed a cuboctahedron vertex, implemented wire mode for that shape.
+
+**************************************************************************
+* 8 May 2005 -- 2.4.0 Release Candidate 1 Released
+**************************************************************************
+(262) Fixed the "vfprintf" for Windows so that error messages get printed
+      out again
+
+(263) Implemented Takeshi Nishimura's menu fixes.  Menus should work now.
+
+**************************************************************************
+* 15 May 2005 -- 2.4.0 Release Candidate 2 Released
+**************************************************************************
+
+(264) More game mode fixes
+
+**************************************************************************
+* 19 May 2005 -- 2.4.0 Release Candidate 3 Released
+**************************************************************************
+
+(265) Lowering minimum autoconf version required.
+
+(266) Guarantee consistency of names/addresses in glutGetProcAddress by
+using a macro. In addition, this avoids any non-constant initializer
+issues which might be raised when using WinDoze GCCs. The additional code
+overhead is negligible, at least for x86 (a few instructions per name).
+
+(267) When switching to game mode under X11, no ConfigureNotify event
+will happen and consequently no reshape callback will ever be called via
+the normal mechanism. To fix this, note that the game mode window needs
+to be resized and handle this before redraw.
+
+(268) The original glutEnterGameMode() returns the window id of the game
+mode window, not TRUE/FALSE, we should better follow that. Note that most
+man pages claim that this function returns void, but this is definitely
+wrong.
+
+(269) Dan Torop's patch to fix joystick polling times (resolves bug 1206856)
+
+**************************************************************************
+* 25 May 2005 -- 2.4.0 Release Candidate 4 Released
+**************************************************************************
+
+(270) Takeshi Nishimura's changes to make the Windows mouse wheel/button mapping match that of X11; also fixing a typo in the associated mouse callback argument list.
+
+**************************************************************************
+* 2 Jun 2005 -- 2.4.0 Release Candidate 5 Released
+**************************************************************************
+
+**************************************************************************
+* 9 Jun 2005 -- 2.4.0 Released
+**************************************************************************
