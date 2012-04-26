@@ -189,10 +189,10 @@ namespace IBDS
 
 		FORCE_INLINE Vec(const T &a, const T &b, const T &c, const T &d) 
 		{
-			elem[0] = a;
-			elem[1] = b;
-			elem[2] = c;
-			elem[3] = d;
+			this->elem[0] = a;
+			this->elem[1] = b;
+			this->elem[2] = c;
+			this->elem[3] = d;
 		} 
 
 		using VecBase<T, 4>::operator =;
@@ -236,9 +236,9 @@ namespace IBDS
 
 		FORCE_INLINE Vec(const T &a, const T &b, const T &c) 
 		{
-			elem[0] = a;
-			elem[1] = b;
-			elem[2] = c;
+			this->elem[0] = a;
+			this->elem[1] = b;
+			this->elem[2] = c;
 		} 
 
 		/** Cross product
@@ -362,8 +362,8 @@ namespace IBDS
 
 		FORCE_INLINE Vec(const T &a, const T &b) 
 		{
-			elem[0] = a;
-			elem[1] = b;
+			this->elem[0] = a;
+			this->elem[1] = b;
 		} 
 
 		using VecBase<T, 2>::operator =;
@@ -403,7 +403,7 @@ namespace IBDS
 
 		FORCE_INLINE Vec(const T &a) 
 		{
-			elem[0] = a;
+			this->elem[0] = a;
 		} 
 
 		using VecBase<T, 1>::operator =;
@@ -443,22 +443,22 @@ namespace IBDS
 
 		FORCE_INLINE Vec(const T &a, const T &b, const T &c, const T &d, const T &e, const T &f) 
 		{
-			elem[0] = a;
-			elem[1] = b;
-			elem[2] = c;
-			elem[3] = d;
-			elem[4] = e;
-			elem[5] = f;
+			this->elem[0] = a;
+			this->elem[1] = b;
+			this->elem[2] = c;
+			this->elem[3] = d;
+			this->elem[4] = e;
+			this->elem[5] = f;
 		} 
 
 		FORCE_INLINE Vec(const VecBase<T, 3> &first, const VecBase<T, 3> &second) 
 		{
-			elem[0] = first[0];
-			elem[1] = first[1];
-			elem[2] = first[2];
-			elem[3] = second[0];
-			elem[4] = second[1];
-			elem[5] = second[2];
+			this->elem[0] = first[0];
+			this->elem[1] = first[1];
+			this->elem[2] = first[2];
+			this->elem[3] = second[0];
+			this->elem[4] = second[1];
+			this->elem[5] = second[2];
 		} 
 
 		using VecBase<T, 6>::operator =;
@@ -506,9 +506,9 @@ namespace IBDS
 
 	//	FORCE_INLINE Vec(const float &a, const float &b, const float &c) 
 	//	{
-	//		elem[0] = a;
-	//		elem[1] = b;
-	//		elem[2] = c;
+	//		this->elem[0] = a;
+	//		this->elem[1] = b;
+	//		this->elem[2] = c;
 	//	} 
 
 	//	/** Cross product
@@ -571,9 +571,9 @@ namespace IBDS
 
 	//	FORCE_INLINE Vec(const double &a, const double &b, const double &c) 
 	//	{
-	//		elem[0] = a;
-	//		elem[1] = b;
-	//		elem[2] = c;
+	//		this->elem[0] = a;
+	//		this->elem[1] = b;
+	//		this->elem[2] = c;
 	//	} 
 
 	//	/** Cross product
@@ -596,14 +596,14 @@ namespace IBDS
 	//{
 	//	__m128d t0, t1, t2, t3; 
 	//	Vec<double, 3> res;
-	//	t0 = _mm_load_pd(&v1.elem[0]); 
-	//	t1 = _mm_load_pd(&v2.elem[0]);   
-	//	t2 = _mm_load_sd(&v1.elem[2]); 
-	//	t3 = _mm_load_sd(&v2.elem[2]);   
+	//	t0 = _mm_load_pd(&v1.this->elem[0]); 
+	//	t1 = _mm_load_pd(&v2.this->elem[0]);   
+	//	t2 = _mm_load_sd(&v1.this->elem[2]); 
+	//	t3 = _mm_load_sd(&v2.this->elem[2]);   
 	//	t0 = _mm_add_pd(t0, t1); 	
 	//	t2 = _mm_add_sd(t2, t3); 	
-	//	_mm_store_pd(&res.elem[0], t0); 
-	//	_mm_store_sd(&res.elem[2], t2); 
+	//	_mm_store_pd(&res.this->elem[0], t0); 
+	//	_mm_store_sd(&res.this->elem[2], t2); 
 	//	return res;
 	//}
 }

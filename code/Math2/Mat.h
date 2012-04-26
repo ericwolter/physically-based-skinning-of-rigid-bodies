@@ -250,9 +250,9 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 3> &v1, const Vec<T, 3> &v2, const Vec<T, 3> &v3)
 		{
-			v[0] = v1;
-			v[1] = v2;
-			v[2] = v3;
+			this->v[0] = v1;
+			this->v[1] = v2;
+			this->v[2] = v3;
 		}
 
 		/** Copy constructor 
@@ -333,15 +333,15 @@ namespace IBDS
 		  */
 		Mat<T, 3, 3> inverse () const
 		{
-			T a = v[0][0];
-			T b = v[0][1];
-			T c = v[0][2];
-			T d = v[1][0];
-			T e = v[1][1];
-			T f = v[1][2];
-			T g = v[2][0];
-			T h = v[2][1];
-			T i = v[2][2];
+			T a = this->v[0][0];
+			T b = this->v[0][1];
+			T c = this->v[0][2];
+			T d = this->v[1][0];
+			T e = this->v[1][1];
+			T f = this->v[1][2];
+			T g = this->v[2][0];
+			T h = this->v[2][1];
+			T i = this->v[2][2];
 			T Div = -c*e*g+b*f*g+c*d*h-a*f*h-b*d*i+a*e*i;
 			if (fabs(Div) < EPSILON)
 			{
@@ -359,19 +359,19 @@ namespace IBDS
 		  */
 		Mat<T, 3, 3> symmInverse () const
 		{
-			T e2_df = v[1][2]*v[1][2] - v[1][1]*v[2][2];  // e^2 - d*f
-			T bf = v[0][1]*v[2][2];
-			T ce = v[0][2]*v[1][2];
-			T c2 = v[0][2]*v[0][2];
-			T cd = v[0][2]*v[1][1];
-			T be = v[0][1]*v[1][2];
-			T af = v[0][0]*v[2][2];
-			T ae = v[0][0]*v[1][2];
-			T bc = v[0][1]*v[0][2];
-			T b2 = v[0][1]*v[0][1];
-			T ad = v[0][0]*v[1][1];
+			T e2_df = this->v[1][2]*this->v[1][2] - this->v[1][1]*this->v[2][2];  // e^2 - d*f
+			T bf = this->v[0][1]*this->v[2][2];
+			T ce = this->v[0][2]*this->v[1][2];
+			T c2 = this->v[0][2]*this->v[0][2];
+			T cd = this->v[0][2]*this->v[1][1];
+			T be = this->v[0][1]*this->v[1][2];
+			T af = this->v[0][0]*this->v[2][2];
+			T ae = this->v[0][0]*this->v[1][2];
+			T bc = this->v[0][1]*this->v[0][2];
+			T b2 = this->v[0][1]*this->v[0][1];
+			T ad = this->v[0][0]*this->v[1][1];
 
-			T Div = (T) 1.0 / (c2*v[1][1] + v[0][1] * (bf - (T) 2.0 * ce) + v[0][0]* e2_df  );
+			T Div = (T) 1.0 / (c2*this->v[1][1] + this->v[0][1] * (bf - (T) 2.0 * ce) + this->v[0][0]* e2_df  );
 
 			T a = e2_df * Div;
 			T b = (bf - ce) * Div;
@@ -390,9 +390,9 @@ namespace IBDS
 		T det () const
 		{
 			T d;
-			d  = v[0][0] * (v[1][1]*v[2][2] - v[1][2] * v[2][1]);		
-			d -= v[0][1] * (v[1][0]*v[2][2] - v[1][2] * v[2][0]);	
-			d += v[0][2] * (v[1][0]*v[2][1] - v[1][1] * v[2][0]);	
+			d  = this->v[0][0] * (this->v[1][1]*this->v[2][2] - this->v[1][2] * this->v[2][1]);		
+			d -= this->v[0][1] * (this->v[1][0]*this->v[2][2] - this->v[1][2] * this->v[2][0]);	
+			d += this->v[0][2] * (this->v[1][0]*this->v[2][1] - this->v[1][1] * this->v[2][0]);	
 			return d;
 		}
 
@@ -400,9 +400,9 @@ namespace IBDS
 		 */
 		FORCE_INLINE T oneNorm() const 
 		{
-			const Real sum1 = fabs(v[0][0]) + fabs(v[1][0]) + fabs(v[2][0]);
-			const Real sum2 = fabs(v[0][1]) + fabs(v[1][1]) + fabs(v[2][1]);
-			const Real sum3 = fabs(v[0][2]) + fabs(v[1][2]) + fabs(v[2][2]);
+			const Real sum1 = fabs(this->v[0][0]) + fabs(this->v[1][0]) + fabs(this->v[2][0]);
+			const Real sum2 = fabs(this->v[0][1]) + fabs(this->v[1][1]) + fabs(this->v[2][1]);
+			const Real sum3 = fabs(this->v[0][2]) + fabs(this->v[1][2]) + fabs(this->v[2][2]);
 			Real maxSum = sum1;
 			if (sum2 > maxSum)
 				maxSum = sum2;
@@ -415,9 +415,9 @@ namespace IBDS
 		 */
 		FORCE_INLINE T infNorm() const 
 		{
-			const Real sum1 = fabs(v[0][0]) + fabs(v[0][1]) + fabs(v[0][2]);
-			const Real sum2 = fabs(v[1][0]) + fabs(v[1][1]) + fabs(v[1][2]);
-			const Real sum3 = fabs(v[2][0]) + fabs(v[2][1]) + fabs(v[2][2]);
+			const Real sum1 = fabs(this->v[0][0]) + fabs(this->v[0][1]) + fabs(this->v[0][2]);
+			const Real sum2 = fabs(this->v[1][0]) + fabs(this->v[1][1]) + fabs(this->v[1][2]);
+			const Real sum3 = fabs(this->v[2][0]) + fabs(this->v[2][1]) + fabs(this->v[2][2]);
 			Real maxSum = sum1;
 			if (sum2 > maxSum)
 				maxSum = sum2;
@@ -471,8 +471,8 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 2> &v1, const Vec<T, 2> &v2)
 		{
-			v[0] = v1;
-			v[1] = v2;
+			this->v[0] = v1;
+			this->v[1] = v2;
 		}
 
 		/** Copy constructor 
@@ -533,10 +533,10 @@ namespace IBDS
 		{
 			Mat<T, 2, 2> inv;
 
-			T a = v[0][0];
-			T b = v[0][1];
-			T c = v[1][0];
-			T d = v[1][1];
+			T a = this->v[0][0];
+			T b = this->v[0][1];
+			T c = this->v[1][0];
+			T d = this->v[1][1];
 			T Div = -b*c + a*d;
 			if (fabs(Div) < EPSILON)
 			{
@@ -586,9 +586,9 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 2> &v1, const Vec<T, 2> &v2, const Vec<T, 2> &v3)
 		{
-			v[0] = v1;
-			v[1] = v2;
-			v[2] = v3;
+			this->v[0] = v1;
+			this->v[1] = v2;
+			this->v[2] = v3;
 		}
 
 		/** Copy constructor 
@@ -634,8 +634,8 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 3> &v1, const Vec<T, 3> &v2)
 		{
-			v[0] = v1;
-			v[1] = v2;
+			this->v[0] = v1;
+			this->v[1] = v2;
 		}
 
 		/** Copy constructor 
@@ -681,18 +681,18 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 1> &v1, const Vec<T, 1> &v2, const Vec<T, 1> &v3)
 		{
-			v[0] = v1;
-			v[1] = v2;
-			v[2] = v3;
+			this->v[0] = v1;
+			this->v[1] = v2;
+			this->v[2] = v3;
 		}
 
 		/** This constructor initializes the matrix with the given row vectors.
 		 */
 		explicit FORCE_INLINE Mat(const T &v1, const T &v2, const T &v3)
 		{
-			v[0][0] = v1;
-			v[1][0] = v2;
-			v[2][0] = v3;
+			this->v[0][0] = v1;
+			this->v[1][0] = v2;
+			this->v[2][0] = v3;
 		}
 
 		/** Copy constructor 
@@ -740,16 +740,16 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 3> &v1)
 		{
-			v[0] = v1;
+			this->v[0] = v1;
 		}
 
 		/** This constructor initializes the matrix with the given row vectors.
 		 */
 		explicit FORCE_INLINE Mat(const T &v1, const T &v2, const T &v3)
 		{
-			v[0][0] = v1;
-			v[0][1] = v2;
-			v[0][2] = v3;
+			this->v[0][0] = v1;
+			this->v[0][1] = v2;
+			this->v[0][2] = v3;
 		}
 
 		/** Copy constructor 
@@ -798,10 +798,10 @@ namespace IBDS
 		 */
 		explicit FORCE_INLINE Mat(const Vec<T, 4> &v1, const Vec<T, 4> &v2, const Vec<T, 4> &v3, const Vec<T, 4> &v4)
 		{
-			v[0] = v1;
-			v[1] = v2;
-			v[2] = v3;
-			v[3] = v4;
+			this->v[0] = v1;
+			this->v[1] = v2;
+			this->v[2] = v3;
+			this->v[3] = v4;
 		}
 
 		/** This constructor creates the matrix with the given values. 
@@ -810,7 +810,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)
-					v[i][j] = matrix[i][j];
+					this->v[i][j] = matrix[i][j];
 		}
 
 		/** This constructor creates the matrix with the given values. 
@@ -819,7 +819,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)
-					v[i][j] = matrix[i*4+j];
+					this->v[i][j] = matrix[i*4+j];
 		}
 
 		/** Copy constructor 
@@ -842,7 +842,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)
-					v[i][j] = matrix[i*4+j];
+					this->v[i][j] = matrix[i*4+j];
 		}
 
 		/** Fills the matrix with the given values from a column-major array 
@@ -851,7 +851,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)
-					v[i][j] = matrix[i+j*4];
+					this->v[i][j] = matrix[i+j*4];
 		}
 
 		/** Get the matrix. 
@@ -860,7 +860,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)
-					matrix[i*4+j] = v[i][j];
+					matrix[i*4+j] = this->v[i][j];
 		}
 
 		/** Get the matrix in column major order 
@@ -869,7 +869,7 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 4; i++)
 				for (int j=0; j < 4; j++)				
-					matrix[i+j*4] = v[i][j];
+					matrix[i+j*4] = this->v[i][j];
 		}
 
 		/** Fills the matrix with the given values. 
@@ -878,15 +878,15 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 3; i++)
 				for (int j=0; j < 3; j++)
-					v[i][j] = matrix[i*4+j];
+					this->v[i][j] = matrix[i*4+j];
 
-			v[0][3] = matrix[12];
-			v[1][3] = matrix[13];
-			v[2][3] = matrix[14];
-			v[3][0] = (T) 0.0;
-			v[3][1] = (T) 0.0;
-			v[3][2] = (T) 0.0;
-			v[3][3] = (T) 1.0;
+			this->v[0][3] = matrix[12];
+			this->v[1][3] = matrix[13];
+			this->v[2][3] = matrix[14];
+			this->v[3][0] = (T) 0.0;
+			this->v[3][1] = (T) 0.0;
+			this->v[3][2] = (T) 0.0;
+			this->v[3][3] = (T) 1.0;
 		}
 
 		/** Get the matrix. 
@@ -895,11 +895,11 @@ namespace IBDS
 		{ 
 			for (int i=0; i < 3; i++)
 				for (int j=0; j < 3; j++)
-					matrix[i*4+j] = v[i][j];
+					matrix[i*4+j] = this->v[i][j];
 
-			matrix[12] = v[0][3];
-			matrix[13] = v[1][3];
-			matrix[14] = v[2][3];
+			matrix[12] = this->v[0][3];
+			matrix[13] = this->v[1][3];
+			matrix[14] = this->v[2][3];
 			matrix[3] = (T) 0.0;
 			matrix[7] = (T) 0.0;
 			matrix[11] = (T) 0.0;
@@ -982,20 +982,20 @@ namespace IBDS
 			Mat<T, 4, 4> inv;
 
 			/* Invertieren des Rotationsteils durch Transponieren */
-			inv[0][0] = v[0][0];
-			inv[0][1] = v[1][0];
-			inv[0][2] = v[2][0];
-			inv[1][0] = v[0][1];
-			inv[1][1] = v[1][1];
-			inv[1][2] = v[2][1];
-			inv[2][0] = v[0][2];
-			inv[2][1] = v[1][2];
-			inv[2][2] = v[2][2];
+			inv[0][0] = this->v[0][0];
+			inv[0][1] = this->v[1][0];
+			inv[0][2] = this->v[2][0];
+			inv[1][0] = this->v[0][1];
+			inv[1][1] = this->v[1][1];
+			inv[1][2] = this->v[2][1];
+			inv[2][0] = this->v[0][2];
+			inv[2][1] = this->v[1][2];
+			inv[2][2] = this->v[2][2];
 
 			/* Verschiebungsvektor:  d' = -(R^-1) * d */
-			inv[0][3] = - inv[0][0]*v[0][3] - inv[0][1]*v[1][3] - inv[0][2]*v[2][3];
-			inv[1][3] = - inv[1][0]*v[0][3] - inv[1][1]*v[1][3] - inv[1][2]*v[2][3];
-			inv[2][3] = - inv[2][0]*v[0][3] - inv[2][1]*v[1][3] - inv[2][2]*v[2][3];
+			inv[0][3] = - inv[0][0]*this->v[0][3] - inv[0][1]*this->v[1][3] - inv[0][2]*this->v[2][3];
+			inv[1][3] = - inv[1][0]*this->v[0][3] - inv[1][1]*this->v[1][3] - inv[1][2]*this->v[2][3];
+			inv[2][3] = - inv[2][0]*this->v[0][3] - inv[2][1]*this->v[1][3] - inv[2][2]*this->v[2][3];
 
 			/* Der Rest bleibt gleich */
 			inv[3][0] = inv[3][1] = inv[3][2] = 0.0;
@@ -1009,9 +1009,9 @@ namespace IBDS
 		void getTransformation (Vec<T, 3> &translation, Mat<T, 3, 3> &rotation, Vec<T, 3> &scale) const
 		{
 			// compute rotation matrix
-			rotation = Mat<T, 3, 3> (	Vec<T, 3> (v[0][0], v[0][1], v[0][2]), 
-											Vec<T, 3> (v[1][0], v[1][1], v[1][2]),
-											Vec<T, 3> (v[2][0], v[2][1], v[2][2]));
+			rotation = Mat<T, 3, 3> (	Vec<T, 3> (this->v[0][0], this->v[0][1], this->v[0][2]), 
+											Vec<T, 3> (this->v[1][0], this->v[1][1], this->v[1][2]),
+											Vec<T, 3> (this->v[2][0], this->v[2][1], this->v[2][2]));
 			scale[0] = rotation[0].length ();
 			scale[1] = rotation[1].length ();
 			scale[2] = rotation[2].length ();
@@ -1021,33 +1021,33 @@ namespace IBDS
 			rotation[1] = 1.0/scale[1] * rotation[1];
 			rotation[2] = 1.0/scale[2] * rotation[2];
 
-			translation = Vec<T, 3> (v[0][3], v[1][3], v[2][3]);
+			translation = Vec<T, 3> (this->v[0][3], this->v[1][3], this->v[2][3]);
 		}
 
 		/** Sets the translation, rotation and scale of this transformation matrix
 		  */
 		void setTransformation (Vec<T, 3> &translation, Mat<T, 3, 3> &rotation, Vec<T, 3> &scale)
 		{
-			v[0][0] = scale[0] * rotation[0][0];
-			v[0][1] = rotation[0][1];
-			v[0][2] = rotation[0][2];
+			this->v[0][0] = scale[0] * rotation[0][0];
+			this->v[0][1] = rotation[0][1];
+			this->v[0][2] = rotation[0][2];
 
-			v[1][0] = rotation[1][0];
-			v[1][1] = scale[1] * rotation[1][1];
-			v[1][2] = rotation[1][2];
+			this->v[1][0] = rotation[1][0];
+			this->v[1][1] = scale[1] * rotation[1][1];
+			this->v[1][2] = rotation[1][2];
 
-			v[2][0] = rotation[2][0];
-			v[2][1] = rotation[2][1];
-			v[2][2] = scale[2] * rotation[2][2];			
+			this->v[2][0] = rotation[2][0];
+			this->v[2][1] = rotation[2][1];
+			this->v[2][2] = scale[2] * rotation[2][2];			
 
-			v[0][3] = translation[0];
-			v[1][3] = translation[1];
-			v[2][3] = translation[2];
-			v[3][3] = (T) 1.0;
+			this->v[0][3] = translation[0];
+			this->v[1][3] = translation[1];
+			this->v[2][3] = translation[2];
+			this->v[3][3] = (T) 1.0;
 
-			v[3][0] = (T) 0.0;
-			v[3][1] = (T) 0.0;
-			v[3][2] = (T) 0.0;
+			this->v[3][0] = (T) 0.0;
+			this->v[3][1] = (T) 0.0;
+			this->v[3][2] = (T) 0.0;
 		}
 	};
 

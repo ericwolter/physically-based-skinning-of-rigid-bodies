@@ -34,7 +34,7 @@ template Mat<Real, 1, 3>;
 template<typename T>
 FORCE_INLINE Mat<T, 3, 1>::operator Vec<T, 3> ()
 {
-	return Vec<T, 3>(v[0][0], v[1][0], v[2][0]);
+	return Vec<T, 3>(this->v[0][0], this->v[1][0], this->v[2][0]);
 }
 
 /** Casting
@@ -42,5 +42,5 @@ FORCE_INLINE Mat<T, 3, 1>::operator Vec<T, 3> ()
 template<typename T>
 FORCE_INLINE Mat<T, 1, 3>::operator Vec<T, 3> ()
 {
-	return Vec<T, 3>(v[0][0], v[0][1], v[0][2]);
+	return Vec<T, 3>(this->v[0][0], this->v[0][1], this->v[0][2]);
 }

@@ -33,7 +33,7 @@ template Vec<Real, 3>;
 template<typename T>
 FORCE_INLINE IBDS::Vec<T, 3>::operator Mat<T, 3, 1> ()
 {
-	return Mat<T, 3, 1>(elem[0], elem[1], elem[2]);
+	return Mat<T, 3, 1>(this->elem[0], this->elem[1], this->elem[2]);
 }
 
 /** Casting
@@ -41,5 +41,5 @@ FORCE_INLINE IBDS::Vec<T, 3>::operator Mat<T, 3, 1> ()
 template<typename T>
 FORCE_INLINE IBDS::Vec<T, 3>::operator Mat<T, 1, 3> ()
 {
-	return Mat<T, 1, 3>(elem[0], elem[1], elem[2]);
+	return Mat<T, 1, 3>(this->elem[0], this->elem[1], this->elem[2]);
 }
