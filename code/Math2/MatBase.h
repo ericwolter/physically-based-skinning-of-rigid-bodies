@@ -219,7 +219,7 @@ namespace IBDS
 		/** Matrix product.
 		 * Be careful: res must not be a reference to m1 or m2
 		 */
-		template<typename T, int rows, int cols, int cols2>
+		template<int cols2>
 		FORCE_INLINE static void mult(const MatBase<T, rows, cols>& m1, const MatBase<T, cols, cols2>& m2, MatBase<T, rows, cols2> &res)
 		{
 			for (int i=0; i < rows; i++)
@@ -238,7 +238,7 @@ namespace IBDS
 		/** Matrix product: m1^T * m2
 		 * Be careful: res must not be a reference to m1 or m2
 		 */
-		template<typename T, int rows, int cols, int cols2>
+		template<int cols2>
 		FORCE_INLINE static void multFirstTransposed(const MatBase<T, cols, rows>& m1, const MatBase<T, cols, cols2>& m2, MatBase<T, rows, cols2> &res)
 		{
 			for (int i=0; i < rows; i++)
@@ -385,7 +385,7 @@ namespace IBDS
 
 		/** set subblock of matrix to values of other matrix
 		 */
-		template<typename T, int rowsB, int colsB, int rowsT, int colsT>
+		template<int rowsB, int colsB, int rowsT, int colsT>
 		FORCE_INLINE static void setBlock(unsigned int topLeftRow, unsigned int topLeftColumn, const MatBase<T, rowsB, colsB>& block, MatBase<T, rowsT, colsT> &target)
 		{
 			int columnCnt = std::min<int>(colsT - topLeftColumn , colsB);
@@ -402,7 +402,7 @@ namespace IBDS
 
 		/** get subblock of matrix and put it in other matrix
 		 */
-		template<typename T, int rowsB, int colsB, int rowsT, int colsT>
+		template<int rowsB, int colsB, int rowsT, int colsT>
 		FORCE_INLINE static void getBlock(unsigned int topLeftRow, unsigned int topLeftColumn, const MatBase<T, rowsB, colsB>& block, MatBase<T, rowsT, colsT> &target)
 		{
 			int columnCnt = std::min<int>(colsB - topLeftColumn , colsT);
