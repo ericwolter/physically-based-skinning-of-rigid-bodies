@@ -1,22 +1,7 @@
-ADD_LIBRARY(Math2
-		../Common/Config.h
-		MathDefs.h
-		MatBase.h
-		Mat.h
-		Mat.cpp
-		VecBase.h
-		Vec.h
-		Vec.cpp
-		CDMath.cpp
-		CDMath.h		
-		SimMath.cpp
-		SimMath.h
-		Quaternion.h
-		Quaternion.cpp
-		VectorND.h
-		VectorND.cpp
-		MatrixNxM.h
-		MatrixNxM.cpp
-		
-		CMakeLists.txt
-)
+project(Math2)
+
+include_directories(include)
+
+file(GLOB_RECURSE Math2_SOURCES src/*.cpp)
+
+add_library(Math2 STATIC ${Math2_SOURCES})

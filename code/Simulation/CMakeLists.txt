@@ -1,25 +1,20 @@
-SET(SIMULATION_LINK_LIBRARIES Math2 freeglut opengl32.lib glu32.lib anttweakbar)
-SET (SIMULATION_DEPENDENCIES Math2 freeglut anttweakbar)
+project(Simulation)
 
-# PROJECT(ClothModel)
-ADD_EXECUTABLE(ClothModel
-	  ClothModel.cpp
-	  ParticleSystem.cpp
-	  ParticleSystem.h  
-	  SimulationStep.cpp
-	  SimulationStep.h
-	  TimeManager.cpp
-	  TimeManager.h
-	  ${VIS_FILES}                    
-	  ${PROJECT_PATH}/Common/Config.h			  
-	  ${PROJECT_PATH}/Common/IDFactory.h			  
-	  ${PROJECT_PATH}/Common/IDFactory.cpp
-	  ${PROJECT_PATH}/Common/StringTools.h			  
-	  ${PROJECT_PATH}/Common/StringTools.cpp
-	  ${PROJECT_PATH}/Common/timing.h			  	  
-	  ${PROJECT_PATH}/Common/timing.cpp
-	  CMakeLists.txt
-)
-ADD_DEPENDENCIES(ClothModel ${SIMULATION_DEPENDENCIES})
-TARGET_LINK_LIBRARIES(ClothModel ${SIMULATION_LINK_LIBRARIES})
-VIS_SOURCE_GROUPS()
+include_directories(${CMAKE_SOURCE_DIR}/Math2/include)
+include_directories(${CMAKE_SOURCE_DIR}/deps/AntTweakBar/include)
+include_directories(${CMAKE_SOURCE_DIR}/deps/glfw/include)
+
+if(APPLE)
+	include_directories(/System/Library/Frameworks)
+	find_library(COCOA_LIBRARY Cocoa)
+	find_library(OpenGL_LIBRARY OpenGL)
+	find_library(GLFW_LIBRARY libglfw.a PATHS ${CMAKE_SOURCE_DIR}/deps/glfw/lib/cocoa/)
+	mark_as_advanced(COCOA_LIBRARY GLUT_LIBRARY OpenGL_LIBRARY)
+	set(EXTRA_LIBS ${COCOA_LIBRARY} ${OpenGL_LIBRARY} ${GLFW_LIBRARY})
+endif()
+
+file(GLOB_RECURSE Simulation_SOURCES src/*.cpp)
+
+add_executable(Simulation ${Simulation_SOURCES})
+
+target_link_libraries(Simulation ${EXTRA_LIBS} AntTweakBar Math2)

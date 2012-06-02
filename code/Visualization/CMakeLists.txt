@@ -1,25 +1,14 @@
-INCLUDE_DIRECTORIES(${PROJECT_PATH}/freeglut/include)
+project(Visualization)
 
-SET(VIS_HEADER_FILES
-	${PROJECT_PATH}/Visualization/MiniGL.h
-	) 
+include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/Math2/include)
+include_directories(${CMAKE_SOURCE_DIR}/deps/AntTweakBar/include)
+include_directories(${CMAKE_SOURCE_DIR}/deps/glfw/include)
 
-	
-SET(VIS_SOURCE_FILES
-	${PROJECT_PATH}/Visualization/MiniGL.cpp                       
-	) 
-	
+file(GLOB_RECURSE Visualization_SOURCES src/*.cpp)
 
-SET(VIS_FILES
-	${VIS_HEADER_FILES}
-	${VIS_SOURCE_FILES}
-	) 
-	
-# A macro for the source groups
-MACRO(VIS_SOURCE_GROUPS)
-	SOURCE_GROUP("Header Files\\Visualization" FILES ${VIS_HEADER_FILES})
-	SOURCE_GROUP("Source Files\\Visualization" FILES ${VIS_SOURCE_FILES})
-ENDMACRO(VIS_SOURCE_GROUPS)
+add_library(Visualization STATIC ${Visualization_SOURCES})
 
+find_library(GLFW_LIBRARY libglfw.a PATHS ${CMAKE_SOURCE_DIR}/deps/glfw/lib/*)
 
-
+target_link_libraries(Visualization AntTweakBar Math2 ${GLFW_LIBRARY})

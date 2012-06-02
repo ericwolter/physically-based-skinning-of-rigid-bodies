@@ -1,16 +1,11 @@
-cmake_minimum_required(VERSION 2.4)
-SET(CMAKE_SUPPRESS_REGENERATION "1")
+cmake_minimum_required(VERSION 2.8)
 
-PROJECT(Simulation)
+add_definitions(-DUSE_DOUBLES)
 
-SET(PROJECT_PATH ${PROJECT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-INCLUDE(${PROJECT_PATH}/CMake/Common.cmake)
+# external deps
+add_subdirectory(deps/AntTweakBar)
 
-SUBDIRS(freeglut Math2 Simulation anttweakbar)
-
-
-
-
-
+add_subdirectory(Math2)
+add_subdirectory(Simulation)
