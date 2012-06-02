@@ -7,5 +7,5 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 # external deps
 add_subdirectory(deps/AntTweakBar)
 
-add_subdirectory(Math2)
+# my own code
 add_subdirectory(Simulation)

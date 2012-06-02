@@ -1,8 +1,13 @@
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 #include <GL/glfw.h>
 #include <AntTweakBar.h>
+
+#include "ObjLoader.h"
+
+using namespace std;
 
 void init();
 void loop();
@@ -18,16 +23,24 @@ float rotate_z = 0;
 const float rotations_per_tick = 0.002;
 const int squares = 15;
 
-int main( int argc, char **argv )
-{
-	std::cout << "test";
-	init();
-	loop();
-	shutdown();
+// Only works for unix based systems
+std::string ExtractDirectory(const string& path) {
+	return path.substr(0, path.find_last_of( '/' ) + 1);
+}
+
+int main(int argc, const char* argv[])
+{	
+	string base_path(ExtractDirectory(argv[0]));
+	string cube_path(base_path+"models/cube.obj");
+	ObjLoader objLoader;
+	objLoader.parseObj(cube_path);
+	// init();
+	// loop();
+	// shutdown();
 }
 
 void init() {
-	std::cout << "initalizing...";
+	cout << "initalizing..." << endl;
 	const int window_width = 800;
 	const int window_height = 600;
 
@@ -69,6 +82,8 @@ void loop() {
 
 	while(true) {
 		double current_time = glfwGetTime();
+		m_time = current_time;
+		TwRefreshBar(m_tweakBar);
 		double delta_rotate = (current_time + old_time) * rotations_per_tick * 360;
 
 		old_time = current_time;

@@ -2,6 +2,13 @@
 #define __OBJLOADER_H__
 
 #include <string>
+#include <vector>
+#include <Eigen/Dense>
+using namespace std;
+using namespace Eigen;
+
+class Polyhedron;
+class Face;
 
 class ObjLoader
 {
@@ -9,9 +16,10 @@ public:
 	ObjLoader();
 	~ObjLoader();
 
-	void parseObj(std::string filename);
+	void parseObj(string filename);
 private:
-	bool parseLine(std::string line);
+	vector<Vector3d> vertices;
+	vector<Vector3d> normals;
 };
 
 #endif
