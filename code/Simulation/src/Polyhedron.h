@@ -10,15 +10,21 @@ using namespace Eigen;
 class Polyhedron
 {
 public:
-	Polyhedron();
-	~Polyhedron();
+    Polyhedron();
+    ~Polyhedron();
 
-	std::vector<Face> faces;
-	double mass;
-	Vector3d centerOfMass;
-	Matrix3d inertiaTensor;
+    std::vector<Face> faces;
 
-	void computeProperties();
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<float> normals;
+
+    float mass;
+    Vector3f centerOfMass;
+    Matrix3f inertiaTensor;
+    Matrix3f inertiaTensorInverse;
+
+    void computeProperties();
 };
 
 #endif

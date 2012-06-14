@@ -13,13 +13,13 @@ class Face;
 class ObjLoader
 {
 public:
-	ObjLoader();
-	~ObjLoader();
+    ObjLoader();
+    ~ObjLoader();
 
-	void parseObj(string filename);
+    Polyhedron parseObj(string filename);
 private:
-	vector<Vector3d> vertices;
-	vector<Vector3d> normals;
+    vector<Vector3f> vertices;
+    vector<Vector3f> normals;
 };
 
 #endif

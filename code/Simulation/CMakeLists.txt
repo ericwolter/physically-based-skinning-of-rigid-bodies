@@ -1,7 +1,6 @@
 project(Simulation)
 
 include_directories(${CMAKE_SOURCE_DIR}/deps/eigen)
-include_directories(${CMAKE_SOURCE_DIR}/deps/AntTweakBar/include)
 include_directories(${CMAKE_SOURCE_DIR}/deps/glfw/include)
 
 if(APPLE)
@@ -14,8 +13,9 @@ if(APPLE)
 endif()
 
 file(COPY src/models DESTINATION ${CMAKE_BINARY_DIR}/Simulation/)
+file(COPY src/shaders DESTINATION ${CMAKE_BINARY_DIR}/Simulation/)
 file(GLOB_RECURSE Simulation_SOURCES src/*.cpp)
 
 add_executable(Simulation ${Simulation_SOURCES})
 
-target_link_libraries(Simulation ${EXTRA_LIBS} AntTweakBar)
+target_link_libraries(Simulation ${EXTRA_LIBS})

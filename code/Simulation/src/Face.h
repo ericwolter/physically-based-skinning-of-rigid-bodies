@@ -9,13 +9,13 @@ using namespace Eigen;
 class Face
 {
 public:
-	Face();
-	~Face();
+    Face();
+    ~Face();
 
-	std::vector<Vector3d> vertices;
-	Vector3d normal;
+    std::vector<Vector3f> vertices;
+    Vector3f normal;
 
-	void computeProperties(Matrix3d& covariance, double& mass, Vector3d& centerOfMass);
+    void computeProperties(Matrix3f &covariance, float &mass, Vector3f &centerOfMass);
 };
 
 #endif
