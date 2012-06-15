@@ -88,14 +88,14 @@ void RigidBody::integrate(float dt)
 {
     std::cout << "position_before: " << position << std::endl;
     // integrate position
-    linearVelocity = linearMomentum / mesh.mass;
+    linearVelocity = linearMomentum * massInverse;
     std::cout << "linearVelocity: " << linearVelocity << std::endl;
     position += linearVelocity * dt;
     std::cout << "position_after: " << position << std::endl;
 
     // integrate orientation
     Matrix3f R = orientation.matrix();
-    inertiaInverse = R * mesh.inertiaTensorInverse * R.transpose();
+    inertiaInverse = R * inertiaTensorInverse * R.transpose();
     angularVelocity = inertiaInverse * angularMomentum;
     float rotSpeed = angularVelocity.norm();
     if (rotSpeed != 0)
