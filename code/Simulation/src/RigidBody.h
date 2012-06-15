@@ -13,7 +13,7 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(Polyhedron polyhedron, Vector3f worldPosition, bool fixed=false);
+	RigidBody(Polyhedron polyhedron, Vector3f worldPosition, Vector4f color, bool fixed=false);
 	~RigidBody();
 
 	Polyhedron mesh;

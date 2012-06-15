@@ -3,14 +3,17 @@
 #include <iostream>
 
 RigidBody::RigidBody() {}
-RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, bool fixed)
+RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, Vector4f color, bool fixed)
 {
     mesh = polyhedron;
 
-    if (fixed) {
+    if (fixed)
+    {
         massInverse = 0;
         inertiaTensorInverse = Matrix3f::Zero();
-    } else {
+    }
+    else
+    {
         massInverse = (1 / polyhedron.mass);
         inertiaTensorInverse = polyhedron.inertiaTensorInverse;
     }
@@ -19,7 +22,7 @@ RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, bool fixed)
     linearVelocity = Vector3f::Zero();
     linearMomentum = Vector3f::Zero();
     force = Vector3f::Zero();
-    force << 0.0f, -9.81f, 0.0f;
+    force << 0.0f, 0.0f, 0.0f;
 
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
@@ -31,20 +34,16 @@ RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, bool fixed)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(mesh.indices[0]), &mesh.indices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    const float color[] =
+    float colorBuffer[mesh.vertices.size() * 4];
+
+    for (int i = 0; i < mesh.vertices.size() * 4; i++)
     {
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-        220.0f / 255.0f, 50.0f / 255.0f, 47.0f / 255.0f, 1.0f,
-    };
+        colorBuffer[i] = color[i % 4];
+    }
+
     glGenBuffers(1, &colorBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, colorBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colorBuffer), colorBuffer, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenBuffers(1, &normalBufferObject);
@@ -77,7 +76,7 @@ RigidBody::~RigidBody() {}
 
 void RigidBody::render(Affine3f cameraTransform, GLuint modelToCameraMatrixUnif)
 {
-    cameraTransform.translate(position);
+    cameraTransform.translate(position - mesh.centerOfMass);
 
     glUniformMatrix4fv(modelToCameraMatrixUnif, 1, GL_FALSE, cameraTransform.data());
     glBindVertexArray(vertexArrayObject);
