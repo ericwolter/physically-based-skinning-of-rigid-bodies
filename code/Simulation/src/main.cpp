@@ -112,9 +112,9 @@ void init()
 		cube = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), Vector3f::Zero());
 		cube2 = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), (MatrixXf(3,1) << 1.0f, 5.0f, 0.0f).finished());
 
-		// glEnable(GL_CULL_FACE);
-		// glCullFace(GL_BACK);
-		// glFrontFace(GL_CW);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
@@ -156,12 +156,12 @@ const float planeNormal[] =
 const float planeData[] =
 {
 	-5.0f, 0.0f, -5.0f, 1.0f,
-	5.0f, 0.0f, 5.0f, 1.0f,
 	-5.0f, 0.0f, 5.0f, 1.0f,
+	5.0f, 0.0f, 5.0f, 1.0f,
 
 	-5.0f, 0.0f, -5.0f, 1.0f,
-	5.0f, 0.0f, -5.0f, 1.0f,
 	5.0f, 0.0f, 5.0f, 1.0f,
+	5.0f, 0.0f, -5.0f, 1.0f,
 
 	0.0f, 40.0f/255.0f, 50.0f/255.0f, 1.0f,
 	0.0f, 40.0f/255.0f, 50.0f/255.0f, 1.0f,
