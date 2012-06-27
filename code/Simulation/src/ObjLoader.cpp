@@ -84,6 +84,14 @@ Polyhedron ObjLoader::parseObj(std::string filename)
                     }
                 }
                 polyhedron.faces.push_back(f);
+
+                Edge e1(f.vertices[1], f.vertices[0]);
+                Edge e2(f.vertices[2], f.vertices[1]);
+                Edge e3(f.vertices[0], f.vertices[2]);
+
+                f.edges.push_back(e1);
+                f.edges.push_back(e2);
+                f.edges.push_back(e3);
             }
         }
         objFile.close();

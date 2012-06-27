@@ -18,9 +18,14 @@ public:
 
 	Polyhedron mesh;
 
+	Vector3f bodyPointToWorld(Vector3f &bodyPoint);
+	Vector3f normalToWorld(Vector3f &normal);
 	void render(Affine3f cameraTransform, GLuint modelToCameraMatrixUnif);
 	void integrate(float dt);
-private:
+
+	void restore();
+	void save();
+
 	// rendering variables
 	GLuint vertexArrayObject;
 	GLuint vertexBufferObject;
@@ -47,6 +52,8 @@ private:
 	// computed quantities
 	Vector3f force;
 	Vector3f torque;
+private:
+	float state[13]; // 3 (Position) + 4 (Orientation) + 3 (LinearMomentum) + 3 (AngularMomentum)
 };
 
 #endif

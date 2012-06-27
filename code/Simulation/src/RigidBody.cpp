@@ -19,10 +19,13 @@ RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, Vector4f col
     }
 
     position = worldPosition;
+    orientation = Quaternionf(1.0f,0.0f,0.0f,0.0f);
     linearVelocity = Vector3f::Zero();
     linearMomentum = Vector3f::Zero();
     force = Vector3f::Zero();
-    force << 0.0f, 0.0f, 0.0f;
+    torque = Vector3f::Zero();
+
+
 
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
@@ -86,14 +89,18 @@ void RigidBody::render(Affine3f cameraTransform, GLuint modelToCameraMatrixUnif)
 
 void RigidBody::integrate(float dt)
 {
-    std::cout << "position_before: " << position << std::endl;
-    // integrate position
+    std::cout << "over dt: " << dt << std::endl;
+    std::cout << "old momentum: " << linearMomentum << std::endl;
+    linearMomentum += force * dt;
+    std::cout << "new momentum: " << linearMomentum << std::endl;
+    std::cout << "old velocity: " << linearVelocity << std::endl;
     linearVelocity = linearMomentum * massInverse;
-    std::cout << "linearVelocity: " << linearVelocity << std::endl;
+    std::cout << "new velocity: " << linearVelocity << std::endl;
+    std::cout << "old position: " << position << std::endl;
     position += linearVelocity * dt;
-    std::cout << "position_after: " << position << std::endl;
+    std::cout << "new position: " << position << std::endl;
 
-    // integrate orientation
+    angularMomentum += torque * dt;
     Matrix3f R = orientation.matrix();
     inertiaInverse = R * inertiaTensorInverse * R.transpose();
     angularVelocity = inertiaInverse * angularMomentum;
@@ -103,13 +110,45 @@ void RigidBody::integrate(float dt)
         Quaternionf q(AngleAxisf(rotSpeed * dt, (1 / rotSpeed)*angularVelocity));
         orientation *= q;
     }
+}
 
-    // integrate linear momentum
-    std::cout << "linearMomentum_before: " << linearMomentum << std::endl;
-    std::cout << "force: " << force << std::endl;
-    linearMomentum += force * dt;
-    std::cout << "linearMomentum_after: " << linearMomentum << std::endl;
+void RigidBody::save()
+{
+    state[0] = position[0];
+    state[1] = position[1];
+    state[2] = position[2];
+    state[3] = orientation.w();
+    state[4] = orientation.x();
+    state[5] = orientation.y();
+    state[6] = orientation.z();
+    state[7] = linearMomentum[0];
+    state[8] = linearMomentum[1];
+    state[9] = linearMomentum[2];
+    state[10] = angularMomentum[0];
+    state[11] = angularMomentum[1];
+    state[12] = angularMomentum[2];
+}
 
-    // integrate angular momentum
-    angularMomentum += torque * dt;
+void RigidBody::restore()
+{
+    position = Vector3f(state[0], state[1], state[2]);
+    orientation = Quaternionf(state[3], state[4], state[5], state[6]);
+    linearMomentum = Vector3f(state[7], state[8], state[9]);
+    angularMomentum = Vector3f(state[10], state[11], state[12]);
+}
+
+Vector3f RigidBody::bodyPointToWorld(Vector3f &bodyPoint)
+{
+    std::cout << "bodyPoint:" << bodyPoint << std::endl;
+    Affine3f t = Affine3f::Identity();
+    t.translate(position);
+    std::cout << "worldPoint:" << t * bodyPoint << std::endl;
+    return t * bodyPoint;
+}
+
+Vector3f RigidBody::normalToWorld(Vector3f &normal)
+{
+    Affine3f t = Affine3f::Identity();
+    t.translate(position);
+    return (t.linear().inverse().transpose() * normal).normalized();
 }

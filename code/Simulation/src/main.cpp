@@ -137,7 +137,7 @@ void init()
         plane = RigidBody(objLoader.parseObj(base_path + "models/plane.obj"), Vector3f::Zero(), groundColor, true);
 
         simulation.bodies.push_back(plane);
-        simulation.bodies.push_back(cube);
+        // simulation.bodies.push_back(cube);
         simulation.bodies.push_back(cube2);
     }
 }
