@@ -2,110 +2,144 @@
 
 #include <limits>
 #include <iostream>
+#include <algorithm>
+#include <set>
 using namespace std;
 
 #define GRAVITY_FORCE -9.81f
+#define THRESHOLD 0.1f
 
 Simulation::Simulation() {}
 Simulation::~Simulation() {}
 
-bool Simulation::findSeperatingPlane(RigidBody &a, RigidBody &b)
+CollisionState Simulation::areColliding(RigidBody &a, RigidBody &b)
 {
-    vector<MatrixXf> potentialPlanesA;
-    vector<MatrixXf> potentialPlanesB;
-    // vector<MatrixXf> potentialPlanesEdges;
+    struct CollisionState collision1 = findSeperatingPlane(a, b);
+    struct CollisionState collision2 = findSeperatingPlane(b, a);
 
-    vector<Face>::iterator face;
-    for (face = a.mesh.faces.begin(); face != a.mesh.faces.end(); face++)
-    {
-        Vector3f planePoint = a.bodyPointToWorld(face->vertices[0]);
-        Vector3f planeNormal = a.normalToWorld(face->normal);
-        potentialPlanesA.push_back((MatrixXf(3, 2) << planePoint, planeNormal).finished());
-    }
-    for (face = b.mesh.faces.begin(); face != b.mesh.faces.end(); face++)
-    {
-        Vector3f planePoint = b.bodyPointToWorld(face->vertices[0]);
-        Vector3f planeNormal = b.normalToWorld(face->normal);
-        potentialPlanesB.push_back((MatrixXf(3, 2) << planePoint, planeNormal).finished());
-    }
+    struct CollisionState collisionResult;
+    collisionResult.type = CLEAR;
 
-    // vector<Face>::iterator faceA;
-    // for (faceA = a.mesh.faces.begin(); faceA != a.mesh.faces.end(); faceA++)
-    // {
-    //     vector<Vector3f>::iterator edgeA;
-    //     for (edgeA = faceA->edges.begin(); edgeA != faceA->edges.end(); edgeA++)
-    //     {
-    //         vector<Face>::iterator faceB;
-    //         for (faceB = b.mesh.faces.begin(); faceB != b.mesh.faces.end(); faceB++)
-    //         {
-    //             vector<Vector3f>::iterator edgeB;
-    //             for (edgeB = faceB->edges.begin(); edgeB != faceB->edges.end(); edgeB++)
-    //             {
-    //                 Vector3f planePoint = a.bodyPointToWorld(edgeA->vertices[0]);
-    //                 Vector3f planeNormal = edgeA.direction.cross(edgeB->direction).normalized();
-    //                 potentialPlanesEdges.push_back((MatrixXf(3, 2) << planePoint, planeNormal).finished());
-    //             }
-    //         }
-    //     }
-    // }
-
-    vector<MatrixXf>::iterator plane;
-    for (plane = potentialPlanesA.begin(); plane != potentialPlanesA.end(); plane++)
+    if (collision1.type == CLEAR && collision2.type == CLEAR)
     {
-        if (testSeperatingPlane((*plane), b))
+        collisionResult.type = CLEAR;
+    } 
+    else if (collision1.type == PENETRATING || collision2.type == PENETRATING)
+    {
+        collisionResult.type = PENETRATING;
+    } 
+    else if (collision1.type == COLLIDING || collision2.type == COLLIDING)
+    {
+        collisionResult.type = COLLIDING;
+        if (collision1.type == COLLIDING)
         {
-        	cout << "found seperating plane" << endl;
-            return true;
-        }
-    }
-    for (plane = potentialPlanesB.begin(); plane != potentialPlanesB.end(); plane++)
-    {
-        if (testSeperatingPlane((*plane), a))
-        {
-        	cout << "found seperating plane" << endl;
-            return true;
-        }
-    }
-
-    // vector<MatrixXf(3, 2)>::iterator plane
-    // for (plane = potentialPlanesEdges.begin(); plane != potentialPlanesEdges.end(); plane++)
-    // {
-    //     if (testSeperatingPlane(plane, b))
-    //     {
-    //         return true;
-    //     }
-    // }
- 
-    return false;
-}
-
-bool Simulation::testSeperatingPlane(MatrixXf &plane, RigidBody &body)
-{
-	cout << "BEGIN testSeperatingPlane" << endl;
-    vector<Face>::iterator face;
-    for (face = body.mesh.faces.begin(); face != body.mesh.faces.end(); face++)
-    {
-        vector<Vector3f>::iterator vertex;
-        for (vertex = face->vertices.begin(); vertex != face->vertices.end(); vertex++)
-        {
-			cout << "testing plane: " << plane << endl;
-			Vector3f worldPoint = body.bodyPointToWorld(*vertex);
-			cout << "against point: " << worldPoint << endl;
-            Vector3f fromPlaneToPoint = worldPoint - plane.col(0);
-            Vector3f planeNormal = plane.col(1);
-
-            float distance = fromPlaneToPoint.dot(planeNormal);
-			cout << "distance: " << distance << endl;
-
-            if (distance < 0)
+            vector<Contact>::iterator contact;
+            for (contact = collision1.contacts.begin(); contact != collision1.contacts.end(); contact++)
             {
-            	cout << "point is behind plane" << endl;
-                return false;
+                collisionResult.contacts.push_back(*contact);
+            }
+        }
+        if (collision2.type == COLLIDING)
+        {
+            vector<Contact>::iterator contact;
+            for (contact = collision2.contacts.begin(); contact != collision2.contacts.end(); contact++)
+            {
+                collisionResult.contacts.push_back(*contact);
             }
         }
     }
 
-    return true;
+    return collisionResult;
+}
+
+CollisionState Simulation::findSeperatingPlane(RigidBody &a, RigidBody &b)
+{
+    std::vector<Vector3f> alreadyFoundContactPoints;
+
+    struct CollisionState collision;
+    collision.type = CLEAR;
+
+    vector<Face>::iterator face1;
+    for (face1 = a.mesh.faces.begin(); (face1 != a.mesh.faces.end() && collision.type != PENETRATING); face1++)
+    {
+        vector<Vector3f>::iterator vertex1;
+        for (vertex1 = face1->vertices.begin(); (vertex1 != face1->vertices.end() && collision.type != PENETRATING); vertex1++)
+        {
+            Vector3f worldPoint = a.bodyPointToWorld(*vertex1);
+            // cout << "worldPoint: " << worldPoint << endl;
+
+            bool vertexIsInside = true;
+            bool vertexIsColliding = false;
+            float closestDistance = THRESHOLD+1;
+            Vector3f closestNormal = Vector3f::Zero();
+
+            vector<Face>::iterator face2;
+            for (face2 = b.mesh.faces.begin(); face2 != b.mesh.faces.end(); face2++)
+            {
+                Vector3f planePoint = b.bodyPointToWorld(face2->vertices[0]);
+                // cout << "planePoint: " << planePoint << endl;
+                Vector3f planeNormal = b.normalToWorld(face2->normal);
+                // cout << "planeNormal: " << planeNormal << endl;
+                Vector3f fromPlaneToPoint = worldPoint - planePoint;
+
+                float distance = fromPlaneToPoint.dot(planeNormal);
+                // cout << "distance: " << distance << endl;
+
+                if (distance > THRESHOLD) {
+                    vertexIsInside = false;
+                    break;
+                } 
+                else if (distance >= - THRESHOLD && distance <= THRESHOLD)
+                {
+                    if (fabs(distance) < closestDistance) {
+                        closestDistance = fabs(distance);
+                        closestNormal = planeNormal;
+                    }
+                    vertexIsInside = true;
+                    vertexIsColliding = true;
+                } else {
+                    vertexIsInside = true;
+                }
+            }
+
+            // cout << "vertexIsInside: " << vertexIsInside << endl;
+            // cout << "vertexIsColliding " << vertexIsColliding << endl;
+
+            if(vertexIsInside && !vertexIsColliding)
+            {
+                collision.type = PENETRATING;
+            } 
+            else if (vertexIsInside && vertexIsColliding)
+            {
+                bool foundOldPoint = false;
+                vector<Vector3f>::iterator oldContactPoint;
+                for (oldContactPoint = alreadyFoundContactPoints.begin(); oldContactPoint != alreadyFoundContactPoints.end(); oldContactPoint++)
+                {
+                    // cout << "oldContactPoint: " << *oldContactPoint << endl;
+                    // cout << "newContactPoint: " << worldPoint << endl;
+                    if (*oldContactPoint == worldPoint)
+                    {
+                        foundOldPoint = true;
+                        break;
+                    }
+                }
+
+                if (!foundOldPoint) {
+                    alreadyFoundContactPoints.push_back(worldPoint);
+
+                    collision.type = COLLIDING;
+                    Contact c = Contact();
+                    c.a = &a;
+                    c.b = &b;
+                    c.point = worldPoint;
+                    c.normal = closestNormal;
+                    collision.contacts.push_back(c);
+                }
+            }
+        }
+    }
+
+    return collision;
 }
 
 void Simulation::step(float dt)
@@ -129,7 +163,8 @@ void Simulation::step(float dt)
     {
         for (int j = i + 1; j < bodies.size() && !bodiesAreColliding; j++)
         {
-            if (!findSeperatingPlane(bodies[i], bodies[j]))
+            struct CollisionState collision = areColliding(bodies[i], bodies[j]);
+            if (collision.type != CLEAR)
             {
                 bodiesAreColliding = true;
             }
@@ -143,10 +178,12 @@ void Simulation::step(float dt)
 
         int loop = 0;
         float sampleTime = dt;
-        while (loop < 8)
+        dt = 0;
+        while (loop < 16)
         {
             sampleTime = sampleTime / 2;
-        	cout << "sampleTime: " << sampleTime << endl;
+            cout << "sampleTime: " << sampleTime << endl;
+            dt = dt + sampleTime;
 
             vector<RigidBody>::iterator body;
             int index = 0;
@@ -158,32 +195,46 @@ void Simulation::step(float dt)
 		        index++;
 		    }
 
+            this->contacts.clear();
             bool bodiesAreColliding = false;
             for (int i = 0; i < bodies.size() && !bodiesAreColliding; i++)
             {
                 for (int j = i + 1; j < bodies.size() && !bodiesAreColliding; j++)
                 {
-                    if (!findSeperatingPlane(bodies[i], bodies[j]))
+                    struct CollisionState collision = areColliding(bodies[i], bodies[j]);
+                    if (collision.type == PENETRATING)
                     {
                         bodiesAreColliding = true;
+                    }
+                    else if (collision.type == COLLIDING)
+                    {
+                        cout << "COLLIDING: " << collision.contacts.size() << endl;
+                        vector<Contact>::iterator contact;
+                        for (contact = collision.contacts.begin(); contact != collision.contacts.end(); contact++)
+                        {
+                            this->contacts.push_back(*contact);   
+                        }
                     }
                 }
             }
 
             if (bodiesAreColliding)
             {
-            	cout << "collision before < " << sampleTime << endl;
+            	cout << "collision before < " << dt << endl;
                 restore();
+                dt = dt - sampleTime;
             }
             else
             {
-            	cout << "collision after > " << sampleTime << endl;
-                dt = dt - sampleTime;
+            	cout << "collision after > " << dt << endl;
             }
             
             loop += 1;
             cout << "loop: " << loop << endl;
         }
+
+        cout << "finding relevant contact points" << endl;
+        cout << "number of contact points: " << this->contacts.size() << endl;
 
         // find relevant contact points
         // for all contact points -> resolve

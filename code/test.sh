@@ -8,4 +8,4 @@ if [[ $rc != 0 ]] ; then
 fi
 
 # run programm
-./build/Simulation/Simulation
+./build/Simulation/SimulationTest

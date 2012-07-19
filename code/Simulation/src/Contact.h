@@ -11,8 +11,8 @@ public:
     Contact();
     ~Contact();
 
-    RigidBody a;
-    RigidBody b;
+    RigidBody *a;
+    RigidBody *b;
 
     Vector3f point;
     Vector3f normal;

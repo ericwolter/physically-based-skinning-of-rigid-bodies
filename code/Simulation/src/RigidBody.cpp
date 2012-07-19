@@ -22,11 +22,12 @@ RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, Vector4f col
     orientation = Quaternionf(1.0f,0.0f,0.0f,0.0f);
     linearVelocity = Vector3f::Zero();
     linearMomentum = Vector3f::Zero();
+    angularVelocity = Vector3f::Zero();
+    angularMomentum = Vector3f::Zero();
     force = Vector3f::Zero();
     torque = Vector3f::Zero();
 
-
-
+    #ifndef TESTING
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(mesh.vertices[0]), &mesh.vertices[0], GL_STATIC_DRAW);
@@ -72,19 +73,21 @@ RigidBody::RigidBody(Polyhedron polyhedron, Vector3f worldPosition, Vector4f col
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0 , 0);
 
     glBindVertexArray(0);
-
+    #endif
 }
 
 RigidBody::~RigidBody() {}
 
 void RigidBody::render(Affine3f cameraTransform, GLuint modelToCameraMatrixUnif)
 {
-    cameraTransform.translate(position - mesh.centerOfMass);
+    #ifndef TESTING
+    cameraTransform.translate(position);
 
     glUniformMatrix4fv(modelToCameraMatrixUnif, 1, GL_FALSE, cameraTransform.data());
     glBindVertexArray(vertexArrayObject);
     glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    #endif
 }
 
 void RigidBody::integrate(float dt)
@@ -139,10 +142,10 @@ void RigidBody::restore()
 
 Vector3f RigidBody::bodyPointToWorld(Vector3f &bodyPoint)
 {
-    std::cout << "bodyPoint:" << bodyPoint << std::endl;
+    // std::cout << "bodyPoint:" << bodyPoint << std::endl;
     Affine3f t = Affine3f::Identity();
     t.translate(position);
-    std::cout << "worldPoint:" << t * bodyPoint << std::endl;
+    // std::cout << "worldPoint:" << t * bodyPoint << std::endl;
     return t * bodyPoint;
 }
 

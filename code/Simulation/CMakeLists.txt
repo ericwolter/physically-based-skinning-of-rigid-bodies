@@ -15,7 +15,10 @@ endif()
 file(COPY src/models DESTINATION ${CMAKE_BINARY_DIR}/Simulation/)
 file(COPY src/shaders DESTINATION ${CMAKE_BINARY_DIR}/Simulation/)
 file(GLOB_RECURSE Simulation_SOURCES src/*.cpp)
+file(GLOB_RECURSE SimulationTest_SOURCES test/*.cpp)
 
 add_executable(Simulation ${Simulation_SOURCES})
+add_executable(SimulationTest ${SimulationTest_SOURCES} src/ObjLoader.cpp src/RigidBody.cpp src/Polyhedron.cpp src/Face.cpp src/Edge.cpp src/Simulation.cpp src/Contact.cpp)
 
 target_link_libraries(Simulation ${EXTRA_LIBS})
+target_link_libraries(SimulationTest ${EXTRA_LIBS})

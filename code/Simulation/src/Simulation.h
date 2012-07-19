@@ -6,6 +6,17 @@
 #include "RigidBody.h"
 #include "Contact.h"
 
+enum CollisionType {
+	CLEAR,
+	PENETRATING,
+	COLLIDING
+};
+
+struct CollisionState {
+	CollisionType type;
+	std::vector<Contact> contacts;
+};
+
 class Simulation
 {
 public:
@@ -13,8 +24,8 @@ public:
 	~Simulation();
 
 	void step(float dt);
-	bool findSeperatingPlane(RigidBody &a, RigidBody &b);
-	bool testSeperatingPlane(MatrixXf &plane, RigidBody &body);
+	CollisionState findSeperatingPlane(RigidBody &a, RigidBody &b);
+	CollisionState areColliding(RigidBody &a, RigidBody &b);
 
 	void render(Affine3f cameraTransform, GLuint modelToCameraMatrixUnif);
 

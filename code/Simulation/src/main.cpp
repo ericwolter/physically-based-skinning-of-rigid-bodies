@@ -104,8 +104,8 @@ void init()
         glfwSetWindowSizeCallback(resize);
         glfwSetWindowTitle("Rigid Body");
 
-        cameraTarget << 0.0f, 0.0f, 0.0f;
-        cameraRelativePosition << 90.0f, -20, 20.f;
+        cameraTarget << 10.0f, 0.0f, 10.0f;
+        cameraRelativePosition << 0.0f, 20.0f, -20.0f;
         lightDirection << 0.0f, 0.5f, 0.0f, 0.0f;
 
         initProgram();
@@ -132,13 +132,13 @@ void init()
         groundColor[2] = 50.0f / 255.0f;
         groundColor[3] = 1.0f;
 
-        cube = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), (MatrixXf(3, 1) << 0.0f, 2.0f, 0.0f).finished(), bodyColor);
-        cube2 = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), (MatrixXf(3, 1) << 1.0f, 10.0f, 0.0f).finished(), bodyColor);
+        cube = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), (MatrixXf(3, 1) << 10.0f, 10.0f, 10.0f).finished(), bodyColor);
+        // cube2 = RigidBody(objLoader.parseObj(base_path + "models/cube.obj"), (MatrixXf(3, 1) << 1.0f, 10.0f, 0.0f).finished(), bodyColor);
         plane = RigidBody(objLoader.parseObj(base_path + "models/plane.obj"), Vector3f::Zero(), groundColor, true);
 
         simulation.bodies.push_back(plane);
-        // simulation.bodies.push_back(cube);
-        simulation.bodies.push_back(cube2);
+        simulation.bodies.push_back(cube);
+        // simulation.bodies.push_back(cube2);
     }
 }
 
