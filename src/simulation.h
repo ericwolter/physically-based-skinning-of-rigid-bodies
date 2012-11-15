@@ -23,7 +23,7 @@ private:
 	void drawGround();
 	void drawFinger1();
 	void drawFinger2();
-	void drawCylinder();
+	void drawBlock();
 	
 	void drawSoftCube();
 
@@ -37,7 +37,7 @@ private:
 	btRigidBody *ground;
 	btRigidBody *finger1;
 	btRigidBody *finger2;
-	btRigidBody *cylinder;
+	btRigidBody *block;
 	
 	CombinedBody *softCube;
 	

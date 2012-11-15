@@ -1,8 +1,5 @@
 #include "combinedbody.h"
-
-const int density = 1;
-const int groupSize = 4;
-const float extrude = 2.0f;
+#include "constants.h"
 
 CombinedBody::CombinedBody(btRigidBody *rigidBody)
 {
@@ -175,7 +172,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 // find corresponding outer particle
                 for(p2 = m_outerParticles.begin(); p2 != m_outerParticles.end(); p2++)
                 {
-                    if (vectorIsEqualWithinMargin(origin + (currentCenterParticle->position - origin) * extrude, (*p2)->position, 0.0001f))
+                    if (vectorIsEqualWithinMargin(origin + (currentCenterParticle->position - origin) * extrude, (*p2)->position, margin))
                     {
                         g->m_particles.push_back(*p2);
                         break;
@@ -249,7 +246,7 @@ void CombinedBody::addAttachedParticle(Particle *newParticle)
     vector<Particle*>::iterator p;
     for(p=m_attachedParticles.begin(); p != m_attachedParticles.end(); p++)
     {
-        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, 0.0001f)) {
+        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, margin)) {
             isNew = true;
         }
         else
@@ -273,7 +270,7 @@ void CombinedBody::addOuterParticle(Particle *newParticle)
     vector<Particle*>::iterator p;
     for(p=m_outerParticles.begin(); p != m_outerParticles.end(); p++)
     {
-        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, 0.1f)) {
+        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, margin)) {
             isNew = true;
         }
         else
@@ -369,7 +366,7 @@ void CombinedBody::integrateTransforms(float timeStep)
             }
             
             btScalar angle = temp.getAngle();
-            if (angle < 0.01f)
+            if (angle < margin)
             {
                 (*p)->angularVelocity = btVector3(0,0,0);
             }

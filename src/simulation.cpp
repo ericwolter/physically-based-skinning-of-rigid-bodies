@@ -13,6 +13,7 @@ using namespace std;
 #include <BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h>
 #include <BulletCollision/NarrowPhaseCollision/btPointCollector.h>
 
+#include "constants.h"
 #include "simulation.h"
 
 Simulation::Simulation() {}
@@ -41,13 +42,30 @@ void Simulation::init(bool useDeformable) {
 	
     ground = new btRigidBody(groundInfo);
     
+    // setup block
+    btCollisionShape *blockShape = new btBoxShape(btVector3(1.5f, 1.0f, 1.0f));
+    
+    btTransform blockTransform;
+    blockTransform.setIdentity();
+    blockTransform.setOrigin(btVector3(0.0f,1.5f,0.0f));
+    
+    btScalar blockMass(1.0f);
+    btVector3 blockLocalInertia(0,0,0);
+    
+    blockShape->calculateLocalInertia(blockMass, blockLocalInertia);
+    btDefaultMotionState *blockMotionState = new btDefaultMotionState(blockTransform);
+    btRigidBody::btRigidBodyConstructionInfo blockInfo(blockMass, blockMotionState, blockShape, blockLocalInertia);
+    
+    block = new btRigidBody(blockInfo);
+    block->setGravity(gravity);
+    
     if (useDeformable) {
         // setup test cube
         btCollisionShape *testCubeShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
         
         btTransform testCubeTransform;
         testCubeTransform.setIdentity();
-        testCubeTransform.setOrigin(btVector3(0,5,5));
+        testCubeTransform.setOrigin(btVector3(0,5,0));
         
         btScalar testCubeMass(1.0f);
         btVector3 testCubeLocalInertia(0,0,0);
@@ -96,23 +114,6 @@ void Simulation::init(bool useDeformable) {
         
         finger2 = new btRigidBody(finger2Info);
         finger2->setGravity(gravity);
-        
-        // setup cylinder
-        btCollisionShape *cylinderShape = new btCylinderShape(btVector3(1.0f, 2.0f, 1.0f));
-        
-        btTransform cylinderTransform;
-        cylinderTransform.setIdentity();
-        cylinderTransform.setOrigin(btVector3(0.0f,2.5f,-1.0f));
-        
-        btScalar cylinderMass(1.0f);
-        btVector3 cylinderLocalInertia(0,0,0);
-        
-        cylinderShape->calculateLocalInertia(cylinderMass, cylinderLocalInertia);
-        btDefaultMotionState *cylinderMotionState = new btDefaultMotionState(cylinderTransform);
-        btRigidBody::btRigidBodyConstructionInfo cylinderInfo(cylinderMass, cylinderMotionState, cylinderShape, cylinderLocalInertia);
-        
-        cylinder = new btRigidBody(cylinderInfo);
-        cylinder->setGravity(gravity);
     }
 }
 
@@ -127,6 +128,7 @@ void Simulation::step(float timeStep) {
         for(int i=0; i< softCube->m_outerParticles.size(); i++)
         {
             Particle *particle = softCube->m_outerParticles.at(i);
+            particle->hasCollided = false;
             
             btMatrix3x3 radiiMatrix = btMatrix3x3(particle->radii.x() * particle->radii.x(), 0, 0, 0, particle->radii.y() * particle->radii.y(), 0, 0, 0, particle->radii.z() * particle->radii.z());
             
@@ -164,10 +166,60 @@ void Simulation::step(float timeStep) {
             }
             
             if(smallerD < d) {
-                particle->predictedPosition -= n * (smallerD - d);
+                particle->predictedPosition += n * (d - smallerD);
                 particle->hasCollided = true;
                 particle->surfaceNormal = n;
                 particle->surfaceVelocity = btVector3(0,0,0);
+            }
+            
+            // collision wiht block
+            btBoxShape *blockShape = (btBoxShape *)block->getCollisionShape();
+            int numPlanes = blockShape->getNumPlanes();
+            for(int pI =0; pI < numPlanes; pI++) {
+                btVector4 plane;
+                blockShape->getPlaneEquation(plane, pI);
+                
+                n = btVector3(plane.x(), plane.y(), plane.z());
+                d = -plane.w();
+                p = d * n;
+                
+                // transform to world space
+                btTransform t = block->getInterpolationWorldTransform();
+                p = t * p;
+                n = t.getBasis() * n;
+                n = n.normalized();
+                d = n.dot(p);
+                
+                btVector3 tmp1 = n * AInv;
+                float tmp2 = tmp1.dot(n);
+                float test = tmp2;
+                
+                btVector3 x1 = (AInv * n)/sqrt(test);
+                btVector3 x2 = -x1;
+                x1 = x1+particle->predictedPosition;
+                x2 = x2+particle->predictedPosition;
+                
+                // transform to body
+                btVector3 bodyX1 = t.inverse() * x1;
+                btVector3 bodyX2 = t.inverse() * x2;
+                
+
+                float d1 = n.dot(x1);
+                float d2 = n.dot(x2);
+                
+                if(d1 < d2) {
+                    if(blockShape->isInside(bodyX1, 0.00001f)) {
+                        cout << "inside1" << endl;
+//                        particle->hasCollided = true;
+//                        particle->predictedPosition += n * (d - d1);
+                    }
+                } else {
+                    if (blockShape->isInside(bodyX2, 0.00001f)) {
+                        cout << "inside2" << endl;
+                        particle->hasCollided = true;
+                        particle->predictedPosition += n * (d - d2);
+                    }
+                }
             }
         }
         
@@ -233,134 +285,138 @@ void Simulation::step(float timeStep) {
 	integrateTransforms(timeStep);
     
     ground->clearForces();
+    block->clearForces();
     
     if(useDeformable) {
         softCube->m_rigidBody->clearForces();
     } else {
         finger1->clearForces();
         finger2->clearForces();
-        cylinder->clearForces();
+        block->clearForces();
     }
 }
 
 void Simulation::collision(float timeStep) {
-    
+
+    int numBodies = 0;
+    btRigidBody** bodies;
     if(useDeformable) {
-        
+        numBodies = 2;
+        btRigidBody* tmp[2] = {block, ground};
+        bodies = tmp;
     } else {
-        btManifoldArray manifoldArray;
-       
-        const int numBodies = 4;
-        btRigidBody* bodies[numBodies] = {cylinder, ground, finger1, finger2};
-       
-        for(int b1 = 0; b1 < numBodies; b1++) {
-            for(int b2 = b1+1 ; b2 < numBodies; b2++) {
-                btCollisionAlgorithm *algo = dispatcher->findAlgorithm(bodies[b1], bodies[b2]);
-                btManifoldResult contactPointResult(bodies[b1],bodies[b2]);
-                dispatchInfo.m_timeStep = timeStep;
-                dispatchInfo.m_stepCount = 0;
-               
-                algo->processCollision(bodies[b1], bodies[b2], dispatchInfo, &contactPointResult);
-                btManifoldArray m;
-                algo->getAllContactManifolds(m);
-               
-                for (int i=0; i < m.size(); i++) {
-                   manifoldArray.push_back(m.at(i));
-                }
+        numBodies = 4;
+        btRigidBody* tmp[4] = {block, ground, finger1, finger2};
+        bodies = tmp;
+    }
+    btManifoldArray manifoldArray;
+   
+    for(int b1 = 0; b1 < numBodies; b1++) {
+        for(int b2 = b1+1 ; b2 < numBodies; b2++) {
+            btCollisionAlgorithm *algo = dispatcher->findAlgorithm(bodies[b1], bodies[b2]);
+            btManifoldResult contactPointResult(bodies[b1],bodies[b2]);
+            dispatchInfo.m_timeStep = timeStep;
+            dispatchInfo.m_stepCount = 0;
+           
+            algo->processCollision(bodies[b1], bodies[b2], dispatchInfo, &contactPointResult);
+            btManifoldArray m;
+            algo->getAllContactManifolds(m);
+           
+            for (int i=0; i < m.size(); i++) {
+               manifoldArray.push_back(m.at(i));
             }
         }
-               
-        for(int s = 0; s < 4; s++)
-        {
-           int numManifolds = manifoldArray.size();
-           for(int i = 0; i < numManifolds; i++)
+    }
+           
+    for(int s = 0; s < 4; s++)
+    {
+       int numManifolds = manifoldArray.size();
+       for(int i = 0; i < numManifolds; i++)
+       {
+           btPersistentManifold *contactManifold = manifoldArray[i];
+           btRigidBody *body1 = (btRigidBody *)contactManifold->getBody0();
+           btRigidBody *body2 = (btRigidBody *)contactManifold->getBody1();
+           
+           int numContacts = contactManifold->getNumContacts();
+           if(numContacts > 0)
            {
-               btPersistentManifold *contactManifold = manifoldArray[i];
-               btRigidBody *body1 = (btRigidBody *)contactManifold->getBody0();
-               btRigidBody *body2 = (btRigidBody *)contactManifold->getBody1();
-               
-               int numContacts = contactManifold->getNumContacts();
-               if(numContacts > 0)
+               for(int c = 0; c < numContacts; c++)
                {
-                   for(int c = 0; c < numContacts; c++)
-                   {
-                       btManifoldPoint contact = contactManifold->getContactPoint(c);
-                       
-                       btVector3 hitPoint = (contact.getPositionWorldOnA() + contact.getPositionWorldOnB()) / 2;
-                       btVector3 normal = contact.m_normalWorldOnB;
-                       btScalar penDepth = fabs(contact.getDistance());
-                       
-                       btVector3 r1 = hitPoint - body1->getCenterOfMassPosition();
-                       btVector3 r2 = hitPoint - body2->getCenterOfMassPosition();
-                       
-                       btVector3 v1 = body1->getLinearVelocity() + (body1->getAngularVelocity().cross(r1));
-                       btVector3 v2 = body2->getLinearVelocity() + (body2->getAngularVelocity().cross(r2));
-                       
-                       btScalar vrel = normal.dot(v1 - v2);
-                       
-                       // src: http://www.xbdev.net/physics/RigidBodyImpulseCubes/index.php
-                       // normal force
-                       btScalar allowedPenetration = 0.1f;
-                       btScalar biasFactor = 0.3f;
-                       btScalar bias;
-                       if ((penDepth - allowedPenetration) < 0.0f) {
-                           bias = 0;
-                       }
-                       else
-                       {
-                           bias = biasFactor * (1/timeStep) * (penDepth - allowedPenetration);
-                       }
-                       
-                       btScalar normal_numerator = (-vrel + bias);
-                       btScalar normal_term1 = body1->getInvMass();
-                       btScalar normal_term2 = body2->getInvMass();
-                       btScalar normal_term3 = normal.dot((body1->getInvInertiaTensorWorld() * r1.cross(normal)).cross(r1));
-                       btScalar normal_term4 = normal.dot((body2->getInvInertiaTensorWorld() * r2.cross(normal)).cross(r2));
-                       
-                       btScalar normal_j = normal_numerator / (normal_term1 + normal_term2 + normal_term3 + normal_term4);
-                       if (normal_j < 0)
-                       {
-                           normal_j = 0;
-                       }
-                       btVector3 normal_force = normal_j * normal;
-                       
-                       body1->setLinearVelocity(body1->getLinearVelocity() + body1->getInvMass() * normal_force);
-                       body1->setAngularVelocity(body1->getAngularVelocity() + r1.cross(normal_force) * body1->getInvInertiaTensorWorld());
-                       body2->setLinearVelocity(body2->getLinearVelocity() - body2->getInvMass() * normal_force);
-                       body2->setAngularVelocity(body2->getAngularVelocity() - r2.cross(normal_force) * body2->getInvInertiaTensorWorld());
-                       
-                       // tangent force (friction)
-                       btVector3 tangent = (v1-v2) - (vrel * normal);
-                       
-                       if(!btFuzzyZero(tangent.x()) || !btFuzzyZero(tangent.y()) || !btFuzzyZero(tangent.z())) {
-                           tangent.normalize();
-                       }
-                       
-                       btScalar tangent_numerator = -(tangent.dot(v1-v2));
-                       btScalar tangent_term1 = body1->getInvMass();
-                       btScalar tangent_term2 = body2->getInvMass();
-                       btScalar tangent_term3 = tangent.dot((body1->getInvInertiaTensorWorld() * r1.cross(tangent)).cross(r1));
-                       btScalar tangent_term4 = tangent.dot((body2->getInvInertiaTensorWorld() * r2.cross(tangent)).cross(r2));
-                       
-                       btScalar tangent_j = tangent_numerator / (tangent_term1 + tangent_term2 + tangent_term3 + tangent_term4);
-                       
-                       // friction: 0.6f
-                       btScalar maxTangentForce = 0.6f * normal_j;
-                       if(tangent_j > maxTangentForce) {
-                           tangent_j = maxTangentForce;
-                       } else if (tangent_j < -maxTangentForce) {
-                           tangent_j = -maxTangentForce;
-                       }
-                       btVector3 tangent_force = tangent_j * tangent;
-                       
-                       body1->setLinearVelocity(body1->getLinearVelocity() + body1->getInvMass() * tangent_force);
-                       body1->setAngularVelocity(body1->getAngularVelocity() + r1.cross(tangent_force) * body1->getInvInertiaTensorWorld());
-                       body2->setLinearVelocity(body2->getLinearVelocity() - body2->getInvMass() * tangent_force);
-                       body2->setAngularVelocity(body2->getAngularVelocity() - r2.cross(tangent_force) * body2->getInvInertiaTensorWorld());
+                   btManifoldPoint contact = contactManifold->getContactPoint(c);
+                   
+                   btVector3 hitPoint = (contact.getPositionWorldOnA() + contact.getPositionWorldOnB()) / 2;
+                   btVector3 normal = contact.m_normalWorldOnB;
+                   btScalar penDepth = fabs(contact.getDistance());
+                   
+                   btVector3 r1 = hitPoint - body1->getCenterOfMassPosition();
+                   btVector3 r2 = hitPoint - body2->getCenterOfMassPosition();
+                   
+                   btVector3 v1 = body1->getLinearVelocity() + (body1->getAngularVelocity().cross(r1));
+                   btVector3 v2 = body2->getLinearVelocity() + (body2->getAngularVelocity().cross(r2));
+                   
+                   btScalar vrel = normal.dot(v1 - v2);
+                   
+                   // src: http://www.xbdev.net/physics/RigidBodyImpulseCubes/index.php
+                   // normal force
+                   btScalar allowedPenetration = 0.1f;
+                   btScalar biasFactor = 0.3f;
+                   btScalar bias;
+                   if ((penDepth - allowedPenetration) < 0.0f) {
+                       bias = 0;
                    }
+                   else
+                   {
+                       bias = biasFactor * (1/timeStep) * (penDepth - allowedPenetration);
+                   }
+                   
+                   btScalar normal_numerator = (-vrel + bias);
+                   btScalar normal_term1 = body1->getInvMass();
+                   btScalar normal_term2 = body2->getInvMass();
+                   btScalar normal_term3 = normal.dot((body1->getInvInertiaTensorWorld() * r1.cross(normal)).cross(r1));
+                   btScalar normal_term4 = normal.dot((body2->getInvInertiaTensorWorld() * r2.cross(normal)).cross(r2));
+                   
+                   btScalar normal_j = normal_numerator / (normal_term1 + normal_term2 + normal_term3 + normal_term4);
+                   if (normal_j < 0)
+                   {
+                       normal_j = 0;
+                   }
+                   btVector3 normal_force = normal_j * normal;
+                   
+                   body1->setLinearVelocity(body1->getLinearVelocity() + body1->getInvMass() * normal_force);
+                   body1->setAngularVelocity(body1->getAngularVelocity() + r1.cross(normal_force) * body1->getInvInertiaTensorWorld());
+                   body2->setLinearVelocity(body2->getLinearVelocity() - body2->getInvMass() * normal_force);
+                   body2->setAngularVelocity(body2->getAngularVelocity() - r2.cross(normal_force) * body2->getInvInertiaTensorWorld());
+                   
+                   // tangent force (friction)
+                   btVector3 tangent = (v1-v2) - (vrel * normal);
+                   
+                   if(!btFuzzyZero(tangent.x()) || !btFuzzyZero(tangent.y()) || !btFuzzyZero(tangent.z())) {
+                       tangent.normalize();
+                   }
+                   
+                   btScalar tangent_numerator = -(tangent.dot(v1-v2));
+                   btScalar tangent_term1 = body1->getInvMass();
+                   btScalar tangent_term2 = body2->getInvMass();
+                   btScalar tangent_term3 = tangent.dot((body1->getInvInertiaTensorWorld() * r1.cross(tangent)).cross(r1));
+                   btScalar tangent_term4 = tangent.dot((body2->getInvInertiaTensorWorld() * r2.cross(tangent)).cross(r2));
+                   
+                   btScalar tangent_j = tangent_numerator / (tangent_term1 + tangent_term2 + tangent_term3 + tangent_term4);
+                   
+                   btScalar maxTangentForce = rigid_friction * normal_j;
+                   if(tangent_j > maxTangentForce) {
+                       tangent_j = maxTangentForce;
+                   } else if (tangent_j < -maxTangentForce) {
+                       tangent_j = -maxTangentForce;
+                   }
+                   btVector3 tangent_force = tangent_j * tangent;
+                   
+                   body1->setLinearVelocity(body1->getLinearVelocity() + body1->getInvMass() * tangent_force);
+                   body1->setAngularVelocity(body1->getAngularVelocity() + r1.cross(tangent_force) * body1->getInvInertiaTensorWorld());
+                   body2->setLinearVelocity(body2->getLinearVelocity() - body2->getInvMass() * tangent_force);
+                   body2->setAngularVelocity(body2->getAngularVelocity() - r2.cross(tangent_force) * body2->getInvInertiaTensorWorld());
                }
            }
-        }
+       }
     }
 }
 
@@ -423,11 +479,11 @@ void Simulation::drawFinger2() {
         glutSolidCube(1.0f);
 	glPopMatrix();
 }
-void Simulation::drawCylinder() {
+void Simulation::drawBlock() {
 	float speccolor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    btCylinderShapeZ *shape = (btCylinderShapeZ *)cylinder->getCollisionShape();
-	btVector3 position = cylinder->getCenterOfMassPosition();
-    btQuaternion orientation = cylinder->getCenterOfMassTransform().getRotation();
+    btBoxShape *shape = (btBoxShape *)block->getCollisionShape();
+	btVector3 position = block->getCenterOfMassPosition();
+    btQuaternion orientation = block->getCenterOfMassTransform().getRotation();
     btScalar rot_angle = orientation.getAngle();
     btVector3 rot_axis = orientation.getAxis();
 	btVector3 fullExtents = shape->getHalfExtentsWithoutMargin() * 2;
@@ -443,18 +499,6 @@ void Simulation::drawCylinder() {
         glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
         glutSolidCube(1.0f);
-//        // src: http://zewaren.net/site/?q=node/58
-//        GLUquadric *quadric = gluNewQuadric();
-//        gluQuadricDrawStyle(quadric, GLU_FILL);
-//        gluQuadricOrientation(quadric, GLU_INSIDE);
-//        gluCylinder(quadric, 0.5f, 0.5f, 1.0f, 20.0f, 20.0f);
-//        glRotatef(180, 1,0,0);
-//        gluDisk(quadric, 0.0f, 0.5f, 20.0f, 1); \
-//        glRotatef(180, 1,0,0); \
-//        glTranslatef(0.0f, 0.0f, 1.0f); \
-//        gluDisk(quadric, 0.0f, 0.5f, 20.0f, 1); \
-//        glTranslatef(0.0f, 0.0f, -1.0f);
-//        gluDeleteQuadric(quadric);
 	glPopMatrix();
 }
 void Simulation::drawSoftCube() {
@@ -520,7 +564,19 @@ void Simulation::drawParticleGroup(ParticleGroup &group) {
     }
 }
 void Simulation::drawParticle(Particle &p) {
-    float speccolor[4] = {1.0f, 1.0f, 0.0f, 1.0f};
+    float* speccolor;
+    float* color;
+    if(p.hasCollided) {
+        float tmp1[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+        speccolor = tmp1;
+        float tmp2[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+        color = tmp2;
+    } else {
+        float tmp1[4] = {1.0f, 1.0f, 0.0f, 1.0f};
+        speccolor = tmp1;
+        float tmp2[4] = {1.0f, 1.0f, 0.0f, 1.0f};
+        color = tmp2;
+    }
 	btVector3 position = p.position;
     btQuaternion orientation = p.orientation;
     btScalar rot_angle = orientation.getAngle();
@@ -528,7 +584,6 @@ void Simulation::drawParticle(Particle &p) {
 	btVector3 fullExtents = p.radii;
     
 	glPushMatrix();
-        float color[4] = {1.0f, 1.0f, 0.0f, 1.0f};
         glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, color);
         glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, color);
         glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, speccolor);
@@ -536,7 +591,6 @@ void Simulation::drawParticle(Particle &p) {
         glTranslatef(position.x(), position.y(), position.z());
         glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
         glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
-//        glutSolidCube(1.0f);
         glutSolidSphere(1.0f, 20.0f, 20.0f);
 	glPopMatrix();
 }
@@ -545,28 +599,33 @@ void Simulation::drawParticle(Particle &p) {
 void Simulation::render() {
 	
 	drawGround();
+    drawBlock();
 	
 	if (useDeformable) {
         drawSoftCube();
 	} else {
 		drawFinger1();
 		drawFinger2();
-	    drawCylinder();
+	    drawBlock();
     }
 }
 
 void Simulation::predictUnconstrainedMotion(float timeStep) {
+    
+    block->applyGravity();
+    block->integrateVelocities(timeStep);
+    block->predictIntegratedTransform(timeStep, block->getInterpolationWorldTransform());
     
     if(useDeformable) {
         
         softCube->applyGravity(timeStep);
         softCube->integrateVelocities(timeStep);
         softCube->predictIntegratedTransform(timeStep, softCube->m_rigidBody->getInterpolationWorldTransform());
-        
+
     } else {
-        cylinder->applyGravity();
-        cylinder->integrateVelocities(timeStep);
-        cylinder->predictIntegratedTransform(timeStep, cylinder->getInterpolationWorldTransform());
+        block->applyGravity();
+        block->integrateVelocities(timeStep);
+        block->predictIntegratedTransform(timeStep, block->getInterpolationWorldTransform());
         
         finger1->applyCentralForce(btVector3(20.0f, 10.0f, 0.0f));
         finger1->integrateVelocities(timeStep);
@@ -580,15 +639,15 @@ void Simulation::predictUnconstrainedMotion(float timeStep) {
 
 void Simulation::integrateTransforms(float timeStep) {
     
+    btTransform predictedTrans;
+    block->predictIntegratedTransform(timeStep, predictedTrans);
+    block->proceedToTransform(predictedTrans);
+    
     if(useDeformable) {
         
         softCube->integrateTransforms(timeStep);
         
     } else {
-        btTransform predictedTrans;
-        
-        cylinder->predictIntegratedTransform(timeStep, predictedTrans);
-        cylinder->proceedToTransform(predictedTrans);
         
         btVector3 fv1 = finger1->getLinearVelocity();
         finger1->setLinearVelocity(btVector3(fv1.x(),fv1.y(),0));

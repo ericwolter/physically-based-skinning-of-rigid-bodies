@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+#include "constants.h"
 #include "particlegroup.h"
 #include <BulletDynamics/btBulletDynamicsCommon.h>
 
@@ -49,7 +50,7 @@ void ParticleGroup::update()
         
         btVector3 goalPosition = R * (particle->restPosition - restCenterOfMass) + currentCenterOfMass;
 //        cout << "old particle position: " << particle->predictedPosition.x() << "|" << particle->predictedPosition.y() << "|" << particle->predictedPosition.z() << "|" << endl;
-        particle->predictedPosition += 0.1 * (goalPosition - particle->predictedPosition);
+        particle->predictedPosition += stiffness * (goalPosition - particle->predictedPosition);
 //        cout << "new particle position: " << particle->predictedPosition.x() << "|" << particle->predictedPosition.y() << "|" << particle->predictedPosition.z() << "|" << endl;
     }
     

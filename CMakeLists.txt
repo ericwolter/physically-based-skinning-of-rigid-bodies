@@ -27,6 +27,7 @@ if(NOT BULLET_FOUND)
 endif(NOT BULLET_FOUND)
 
 file(GLOB_RECURSE Thesis_SOURCES src/*.cpp)
-add_executable(Thesis ${Thesis_SOURCES})
+file(GLOB_RECURSE Thesis_HEADERS src/*.h)
+add_executable(Thesis ${Thesis_SOURCES} ${Thesis_HEADERS})
 
 target_link_libraries(Thesis ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${BULLET_LIBRARIES})
