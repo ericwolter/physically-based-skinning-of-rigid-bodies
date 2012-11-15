@@ -1,0 +1,182 @@
+%BCOR: BindeKorrektur. Sie macht den Rand auf der Seite an der das
+%      Werk gebunden wird größer.
+%DIV:  ist bei einer 12pt schrift standardmäßig auf 12 eingestellt, und
+%      ist ein Maß für den beschreibbaren bereich. Je größer der Wert,
+%      desto größer der schreibbare Bereich und desto kleiner die
+%      Ränder
+\documentclass[BCOR15mm,DIV10,12pt,twoside,appendixprefix,final,
+							 accentcolor=tud5b,colorback,longdoc,bigchapter,firstlineindent]{tudreport}
+
+%Deutsche Rechtschreibung und Schriftarteinstellungen
+%\usepackage[ngerman]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+% Grafiken, Tabellen, lange Tabellen
+\usepackage[]{graphicx,color}
+\usepackage[]{array}
+\usepackage[]{tabularx}
+\usepackage[]{longtable}
+\usepackage[]{booktabs}
+
+%Neudefinition des Abstandes zwischen 2 cmidrules, d.h.
+%den mittleren Trennstrichen innerhalb von Tabellen
+\cmidrulesep=0.5\doublerulesep
+\usepackage[]{subfigure}
+%\usepackage[]{epsfig}
+\usepackage[]{rotating}
+%Ams-tex Paket für erweiterte Mathematik-Umgebungen
+\usepackage[]{amsmath}
+%\usepackage[]{amssymb,amsfonts,amsxtra}
+\usepackage[]{theorem}
+
+%Darstellung von Code
+\usepackage[]{verbatim}
+\usepackage[]{moreverb}
+\usepackage[]{latexsym}
+
+%Darstellung von Algorithmen
+\usepackage[ruled,chapter]{algorithm}
+\usepackage[]{algorithmic}
+
+%Setzen der Alg.Benennungen von engl.-->dt.
+\floatname{algorithm}{Algorithmus}
+\renewcommand{\listalgorithmname}{Liste der Algorithmen}
+
+%Literaturverzeichnis (Stil der Referencen)
+\usepackage[square,sort&compress]{natbib}
+
+% Pfad entlang dem die Bilder gesucht werden.
+\graphicspath{{images/}}
+
+% Label einer Abbildungs- oder Tabellenunterschrift fett
+\addtokomafont{captionlabel}{\bfseries\sffamily\small}
+
+% Einheiten fuer Bilder (picture-Umgebung)
+\unitlength1mm
+
+% Die Folgenden Einstellungen sollten an die vorliegenden Bedingungen
+% angepasst werden:
+
+% Tiefe der Gliederung
+%\setcounter{secnumdepth}{5}
+
+% Tiefe des Inhaltsverzeichnisses
+%\setcounter{tocdepth}{4}
+
+% --- Trennmuster fuer Ausnahmefaelle
+%\hyphenation{Lern-al-go-rith-men}
+%\hyphenation{Schur-Kom-ple-ment}
+%\hyphenation{Volumen-Pen-al-ty-For-mulier-ung}
+%\hyphenation{elasto-plas-tische}
+
+% Definition von Theorem-Umgebungen
+\theoremstyle{break}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{satz}{Satz}[section]
+\newtheorem{beweis}{Beweis}[section]
+\newtheorem{schluss}{Schlu"sfolgerung}[section]
+\newtheorem{beispiel}{Beispiel}[section]
+
+
+\title{%
+  Combining Rigid body simulations with oriented particles
+}
+
+\subtitle{%
+  Bachelor's thesis
+}
+
+\institution{%
+TU Darmstadt
+}
+
+% enter file name without extension eps/pdf
+\setinstitutionlogo[height]{%
+gsclogofull%
+}
+
+%\dedication{%
+%To my incredibly patient wife.
+%}
+
+%\uppertitleback{%
+%
+%}
+
+\lowertitleback{%
+Technische Universität Darmstadt, 2010
+}
+
+%\settitlepicture{%
+%GSCKeyVisualreport.eps
+%}
+
+
+%%%%%%%%%%%%%%%%%%%%%% HAUPTDATEI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%**** Titelseite und eidesstattliche Erklärung****
+\pagestyle{empty}
+\maketitle{}
+\cleardoublepage
+\include{eid}
+\cleardoublepage
+\include{abstract}
+\cleardoublepage
+
+% ***** Wichtige Seiten *****
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+\listoftables
+
+% sofern vorhanden, einkommentieren:
+\listofalgorithms
+\include{symbolverzeichnis}
+\newcounter{roman_counter}
+\setcounter{roman_counter}{\value{page}}
+
+%*****Beginn der eigentlichen Arbeit********
+\clearpage
+
+%\pagestyle{scrheadings}
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\include{chap1}
+\include{chap2}
+\include{chap3}
+\include{chap4}
+\include{chap5}
+\include{chap6}
+\include{chap7}
+
+% Literaturverzeichnis einfügen
+\cleardoublepage
+\bibliographystyle{abbrv}
+\addcontentsline{toc}{chapter}{\textbf{Literaturverzeichnis}}
+%\bibliography{bibdatabase}
+\cleardoublepage
+
+% Bei Bedarf kann der Anhang noch römische Ziffern erhalten...
+%\pagenumbering{roman}
+%\setcounter{page}{\value{roman_counter}}
+
+ \appendix
+ \include{appendixa}
+
+%möchte man, dass Quellen im Lit.-Verzeichnis erscheinen, die nicht zitiert wurden
+%kann ein 'nocite{quelle}' genutzt werden
+%\nocite{quelle1}
+%\nocite{quelle2}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+% LocalWords:  BCOR BindeKorrektur pt schrift bereich Appendix
