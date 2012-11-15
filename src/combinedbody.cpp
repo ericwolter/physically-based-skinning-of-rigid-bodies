@@ -1,13 +1,4 @@
-//
-//  CombinedBody.cpp
-//  BachelorThesis
-//
-//  Created by Eric Wolter on 9/28/12.
-//  Copyright (c) 2012 Eric Wolter. All rights reserved.
-//
-
-#include <list>
-#include "CombinedBody.h"
+#include "combinedbody.h"
 
 const int density = 1;
 const int groupSize = 4;
@@ -16,8 +7,7 @@ const float extrude = 2.0f;
 CombinedBody::CombinedBody(btRigidBody *rigidBody)
 {
     m_rigidBody = rigidBody;
-    btVector3 tmpOrigin = this->m_rigidBody->getWorldTransform().getOrigin();
-    Vector3f origin = Vector3f(tmpOrigin.x(), tmpOrigin.y(), tmpOrigin.z());
+    btVector3 origin = this->m_rigidBody->getWorldTransform().getOrigin();
     restPosition = origin;
     
     if(m_rigidBody->isActive() && (!m_rigidBody->isStaticObject()))
@@ -27,9 +17,29 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
             btBoxShape *box = (btBoxShape *)m_rigidBody->getCollisionShape();
             
             btVector3 halfExtents = box->getHalfExtentsWithoutMargin();
+            btVector3 fullExtent = halfExtents * 2;
             
-            Vector3f fullExtent = Vector3f(halfExtents.x(), halfExtents.y(), halfExtents.z()) * 2;
-            Vector3f offset = fullExtent / (density + 1);
+            btVector3 offset = fullExtent / (density + 1);
+            
+//            Particle *p1 = new Particle();
+//            p1->mass = 0.01f;
+//            p1->radii = btVector3(0.3f, 0.1f, 0.3f);
+//            p1->relativePosition = btVector3(0, 0, 0);
+//            p1->position = origin + p1->relativePosition;
+//            p1->orientation = btQuaternion(btVector3(0,0,1), 90*(M_PI/180));
+//            addOuterParticle(p1);
+//            Particle *p2 = new Particle();
+//            p2->mass = 0.01f;
+//            p2->radii = btVector3(0.3f, 0.1f, 0.3f);
+//            p2->relativePosition = btVector3(1, 0, 0);
+//            p2->position = origin + p2->relativePosition;
+//            p2->orientation = btQuaternion(btVector3(0,0,1), 90*(M_PI/180));
+//            addOuterParticle(p2);
+//            
+//            ParticleGroup *g = new ParticleGroup();
+//            g->m_particles.push_back(p1);
+//            g->m_particles.push_back(p2);
+//            m_particleGroups.push_back(g);
             
             // TopSide
             for(float x = 0; x <= fullExtent.x(); x+=offset.x())
@@ -38,10 +48,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(-halfExtents.x()+x, halfExtents.y(), -halfExtents.z()+z);
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(-halfExtents.x()+x, halfExtents.y(), -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
@@ -52,10 +62,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(-halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(-halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(0,0,1), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
@@ -66,10 +76,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(-halfExtents.x()+x, -halfExtents.y()+y, halfExtents.z());
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, halfExtents.z());
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
@@ -80,10 +90,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(0,0,1), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
@@ -94,10 +104,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(-halfExtents.x()+x, -halfExtents.y()+y, -halfExtents.z());
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, -halfExtents.z());
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
@@ -108,16 +118,26 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 {
                     Particle *p = new Particle();
                     p->mass = 0.01f;
-                    p->radii = Vector3f(0.2f, 0.1f, 0.1f);
-                    p->relativePosition = Vector3f(-halfExtents.x()+x, -halfExtents.y(), -halfExtents.z()+z);
+                    p->radii = btVector3(0.3f, 0.1f, 0.3f);
+                    p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y(), -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
-                    p->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
+                    p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
             }
             
             // create inner particle groups
             vector<Particle*>::iterator p;
+            for(p = m_attachedParticles.begin(); p != m_attachedParticles.end(); p++) {
+                Particle *oP = new Particle();
+                oP->mass = 0.01f;
+                oP->radii = btVector3(0.3f, 0.1f, 0.3f);
+                btVector3 origin = this->m_rigidBody->getWorldTransform().getOrigin();
+                oP->position = origin + ((*p)->position - origin) * extrude;
+                oP->orientation = (*p)->orientation;
+                addOuterParticle(oP);
+            }
+            
             for(p = m_attachedParticles.begin(); p!= m_attachedParticles.end(); p++)
             {
                 Particle *currentCenterParticle = *p;
@@ -127,15 +147,17 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 vector<Particle*>::iterator p2;
                 for(p2 = m_attachedParticles.begin(); p2 != m_attachedParticles.end(); p2++)
                 {
-                    float distanceToCenter = (currentCenterParticle->restPosition - (*p2)->restPosition).squaredNorm();
+                    btVector3 diff = currentCenterParticle->position - (*p2)->position;
+                    float distanceToCenter = diff.length2();
                     
                     int position = 0;
                     for(int i = 1; i <= sorted.size(); i++)
                     {
                         position = i;
                         Particle *sortedParticle = sorted[i-1];
-                        if (distanceToCenter < (currentCenterParticle->restPosition - sortedParticle->restPosition).squaredNorm())
+                        if (distanceToCenter < (currentCenterParticle->position - sortedParticle->position).length2())
                         {
+                            position -= 1;
                             break;
                         }
                     }
@@ -153,7 +175,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 // find corresponding outer particle
                 for(p2 = m_outerParticles.begin(); p2 != m_outerParticles.end(); p2++)
                 {
-                    if (vectorIsEqualWithinMargin(currentCenterParticle->position, (*p2)->position / extrude, 0.1f))
+                    if (vectorIsEqualWithinMargin(origin + (currentCenterParticle->position - origin) * extrude, (*p2)->position, 0.0001f))
                     {
                         g->m_particles.push_back(*p2);
                         break;
@@ -173,15 +195,16 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 vector<Particle*>::iterator p2;
                 for(p2 = m_outerParticles.begin(); p2 != m_outerParticles.end(); p2++)
                 {
-                    float distanceToCenter = (currentCenterParticle->restPosition - (*p2)->restPosition).squaredNorm();
+                    float distanceToCenter = (currentCenterParticle->position - (*p2)->position).length2();
                     
                     int position = 0;
                     for(int i = 1; i <= sorted.size(); i++)
                     {
                         position = i;
                         Particle *sortedParticle = sorted[i-1];
-                        if (distanceToCenter < (currentCenterParticle->restPosition - sortedParticle->restPosition).squaredNorm())
+                        if (distanceToCenter < (currentCenterParticle->position - sortedParticle->position).length2())
                         {
+                            position -= 1;
                             break;
                         }
                     }
@@ -196,10 +219,10 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     g->m_particles.push_back(sorted.at(i));
                 }
                 
-                // find corresponding outer particle
+                // find corresponding inner particle
                 for(p2 = m_attachedParticles.begin(); p2 != m_attachedParticles.end(); p2++)
                 {
-                    if (vectorIsEqualWithinMargin(currentCenterParticle->position, (*p2)->position * extrude, 0.1f))
+                    if (vectorIsEqualWithinMargin(currentCenterParticle->position, origin + ((*p2)->position - origin) * extrude, 0.1f))
                     {
                         g->m_particles.push_back(*p2);
                         break;
@@ -208,7 +231,6 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 
                 m_particleGroups.push_back(g);
             }
-            
         }
     }
     
@@ -227,13 +249,14 @@ void CombinedBody::addAttachedParticle(Particle *newParticle)
     vector<Particle*>::iterator p;
     for(p=m_attachedParticles.begin(); p != m_attachedParticles.end(); p++)
     {
-        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, 0.1f)) {
+        if (!vectorIsEqualWithinMargin((*p)->position, newParticle->position, 0.0001f)) {
             isNew = true;
         }
         else
         {
             isNew = false;
-            (*p)->orientation = (*p)->orientation * newParticle->restOrientation;
+            btQuaternion s = (*p)->orientation.slerp(newParticle->orientation, 0.5f);
+            (*p)->orientation = s;
             break;
         }
     }
@@ -241,15 +264,6 @@ void CombinedBody::addAttachedParticle(Particle *newParticle)
     if (isNew) {
         m_attachedParticles.push_back(newParticle);
         m_particles.push_back(newParticle);
-        
-        Particle *oP = new Particle();
-        oP->mass = 0.01f;
-        oP->radii = Vector3f(0.2f, 0.1f, 0.1f);
-        btVector3 tmpOrigin = this->m_rigidBody->getWorldTransform().getOrigin();
-        Vector3f origin = Vector3f(tmpOrigin.x(), tmpOrigin.y(), tmpOrigin.z());
-        oP->position = origin + (newParticle->position - origin) * extrude;
-        oP->orientation = AngleAxis<float>(0, Vector3f(1, 0, 0));
-        addOuterParticle(oP);
     }
 }
 
@@ -277,7 +291,7 @@ void CombinedBody::addOuterParticle(Particle *newParticle)
     }
 }
 
-bool CombinedBody::vectorIsEqualWithinMargin(Vector3f v1, Vector3f v2, float margin)
+bool CombinedBody::vectorIsEqualWithinMargin(btVector3 v1, btVector3 v2, float margin)
 {
     float x1 = v1.x();
     float y1 = v1.y();
@@ -301,7 +315,7 @@ void CombinedBody::applyGravity(float timeStep)
     vector<Particle*>::iterator p;
     for(p = m_particles.begin(); p != m_particles.end(); p++)
     {
-        (*p)->linearVelocity += timeStep * Vector3f(gravity.x(), gravity.y(), gravity.z());
+        (*p)->linearVelocity += timeStep * btVector3(gravity.x(), gravity.y(), gravity.z());
     }
 }
 
@@ -318,14 +332,16 @@ void CombinedBody::predictIntegratedTransform(float timeStep, btTransform &predi
     for(p = m_particles.begin(); p != m_particles.end(); p++)
     {
         (*p)->predictedPosition = (*p)->position + (*p)->linearVelocity * timeStep;
-        if ((*p)->angularVelocity.norm() < 0.1f)
+        if ((*p)->angularVelocity.length() < 0.1f)
         {
             (*p)->predictedOrientation = (*p)->orientation;
         }
         else
         {
-            Vector3f temp = (*p)->angularVelocity.normalized() * sin(((*p)->angularVelocity.norm()*timeStep)/2);
-            (*p)->predictedOrientation = Quaternionf(cos(((*p)->angularVelocity.norm()*timeStep)/2),temp.x(), temp.y(), temp.z());
+            btVector3 xyz = (*p)->angularVelocity.normalized() * sin(((*p)->angularVelocity.length()*timeStep)/2);
+            btScalar w = cos(((*p)->angularVelocity.length()*timeStep)/2);
+            btQuaternion tmp = btQuaternion(xyz.x(), xyz.y(), xyz.z(), w);
+            (*p)->predictedOrientation = tmp * (*p)->orientation;
         }
     }
 }
@@ -345,26 +361,24 @@ void CombinedBody::integrateTransforms(float timeStep)
             (*p)->position = (*p)->predictedPosition;
             
             // rotation transforming orientation to predicted orientation
-            Quaternionf temp = (*p)->predictedOrientation * (*p)->orientation.inverse();
+            btQuaternion temp = (*p)->predictedOrientation * (*p)->orientation.inverse();
             // there are always two rotations, choose the shorter one
             if (temp.w() < 0)
             {
-                temp = Quaternionf(-temp.w(), -temp.x(), -temp.y(), -temp.z());
+                temp = btQuaternion(-temp.x(), -temp.y(), -temp.z(), -temp.w());
             }
             
-            float angle = Particle::angleQuaternion(temp);
+            btScalar angle = temp.getAngle();
             if (angle < 0.01f)
             {
-                (*p)->angularVelocity = Vector3f::Zero();
+                (*p)->angularVelocity = btVector3(0,0,0);
             }
             else
             {
-                (*p)->angularVelocity = Particle::axisQuaternion(temp) * angle / timeStep;
+                (*p)->angularVelocity = temp.getAxis() * (angle / timeStep);
             }
             
             (*p)->orientation = (*p)->predictedOrientation;
         }
     }
 }
-
-
