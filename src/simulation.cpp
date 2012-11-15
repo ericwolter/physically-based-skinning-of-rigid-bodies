@@ -213,28 +213,18 @@ void Simulation::step(float timeStep) {
         
         //
         for(int i = 0; i < softCube->m_attachedParticles.size(); i++) {
-//            cout << "particle: " << i << endl;
             Particle *particle = softCube->m_attachedParticles.at(i);
             
             btTransform bodyTransform = softCube->m_rigidBody->getInterpolationWorldTransform();
-            btVector3 bodyPosition = bodyTransform.getOrigin();
             btVector3 truePosition = bodyTransform * particle->relativePosition;
             
             btVector3 particlePosition = particle->predictedPosition;
             btVector3 delta = particlePosition - truePosition;
             btVector3 impulse = (particle->mass * delta) / timeStep;
-//            cout << "bodyPosition: " << bodyPosition.x() << "|" << bodyPosition.y() << "|" << bodyPosition.z() << "|" << endl;
-//            cout << "particlePosition: " << particlePosition.x() << "|" << particlePosition.y() << "|" << particlePosition.z() << "|" << endl;
-//            cout << "truePosition: " << truePosition.x() << "|" << truePosition.y() << "|" << truePosition.z() << "|" << endl;
-//            cout << "delta: " << delta.x() << "|" << delta.y() << "|" << delta.z() << "|" << endl;
-//            cout << "impulse: " << impulse.x() << "|" << impulse.y() << "|" << impulse.z() << "|" << endl;
             
             btVector3 bodyVelocity = softCube->m_rigidBody->getLinearVelocity();
-//            cout << "bodyVelocity_before: " << bodyVelocity.x() << "|" << bodyVelocity.y() << "|" << bodyVelocity.z() << "|" << endl;
             softCube->m_rigidBody->applyImpulse(impulse, particle->relativePosition);
             bodyVelocity = softCube->m_rigidBody->getLinearVelocity();
-//            cout << "bodyVelocity_after: " << bodyVelocity.x() << "|" << bodyVelocity.y() << "|" << bodyVelocity.z() << "|" << endl;
-            
             particle->predictedPosition = truePosition;
         }
     }
