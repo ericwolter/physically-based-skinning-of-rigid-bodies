@@ -202,7 +202,6 @@ void Simulation::step(float timeStep) {
                 // transform to body
                 btVector3 bodyX1 = t.inverse() * x1;
                 btVector3 bodyX2 = t.inverse() * x2;
-                
 
                 float d1 = n.dot(x1);
                 float d2 = n.dot(x2);
@@ -210,14 +209,20 @@ void Simulation::step(float timeStep) {
                 if(d1 < d2) {
                     if(blockShape->isInside(bodyX1, 0.00001f)) {
                         cout << "inside1" << endl;
-//                        particle->hasCollided = true;
-//                        particle->predictedPosition += n * (d - d1);
+                        particle->hasCollided = true;
+                        btVector3 delta = n * (d - d1);
+                        particle->predictedPosition += delta;
+                        
+                        block->applyImpulse((particle->mass * -delta) / timeStep, t.getOrigin() - x1);
                     }
                 } else {
                     if (blockShape->isInside(bodyX2, 0.00001f)) {
                         cout << "inside2" << endl;
                         particle->hasCollided = true;
-                        particle->predictedPosition += n * (d - d2);
+                        btVector3 delta = n * (d - d2);
+                        particle->predictedPosition += delta;
+                        
+                        block->applyImpulse((particle->mass * -delta) / timeStep, t.getOrigin() - x2);
                     }
                 }
             }
