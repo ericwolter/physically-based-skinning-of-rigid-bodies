@@ -33,3 +33,12 @@ float Particle::getSqrDistance(Particle *p1, Particle *p2)
             (p1->position.y() - p2->position.y()) * (p1->position.y() - p2->position.y()) +
             (p1->position.z() - p2->position.z()) * (p1->position.z() - p2->position.z());
 }
+
+btMatrix3x3 Particle::getInvInertiaTensorWorld() {
+    btMatrix3x3 tensor = btMatrix3x3(
+        (mass/5)*(radii.y()*radii.y() + radii.z()*radii.z()),0,0,
+        0,(mass/5)*(radii.x()*radii.x() + radii.z()*radii.z()),0,
+        0,0,(mass/5)*(radii.x()*radii.x() + radii.y()*radii.y()));
+    
+    return tensor.inverse();
+}

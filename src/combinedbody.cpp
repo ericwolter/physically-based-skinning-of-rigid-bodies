@@ -18,6 +18,8 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
             
             btVector3 offset = fullExtent / (density + 1);
             
+            btScalar particleMass = 0.01f;
+            
 //            Particle *p1 = new Particle();
 //            p1->mass = 0.01f;
 //            p1->radii = btVector3(0.3f, 0.1f, 0.3f);
@@ -44,7 +46,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float z = 0; z <= fullExtent.z(); z+=offset.z())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, halfExtents.y(), -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
@@ -58,7 +60,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float z = 0; z <= fullExtent.z(); z+=offset.z())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
@@ -72,7 +74,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float y = 0; y <= fullExtent.y(); y+=offset.y())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, halfExtents.z());
                     p->position = origin + p->relativePosition;
@@ -86,7 +88,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float z = 0; z <= fullExtent.z(); z+=offset.z())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
@@ -100,7 +102,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float y = 0; y <= fullExtent.y(); y+=offset.y())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, -halfExtents.z());
                     p->position = origin + p->relativePosition;
@@ -114,7 +116,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 for (float z = 0; z <= fullExtent.z(); z+=offset.z())
                 {
                     Particle *p = new Particle();
-                    p->mass = 0.01f;
+                    p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y(), -halfExtents.z()+z);
                     p->position = origin + p->relativePosition;
@@ -127,7 +129,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
             vector<Particle*>::iterator p;
             for(p = m_attachedParticles.begin(); p != m_attachedParticles.end(); p++) {
                 Particle *oP = new Particle();
-                oP->mass = 0.01f;
+                oP->mass = particleMass;
                 oP->radii = btVector3(0.3f, 0.1f, 0.3f);
                 btVector3 origin = this->m_rigidBody->getWorldTransform().getOrigin();
                 oP->position = origin + ((*p)->position - origin) * extrude;

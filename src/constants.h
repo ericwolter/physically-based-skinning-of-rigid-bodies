@@ -15,7 +15,7 @@ static const float extrude = 2.0f;
 static const float margin = 0.0001f;
 
 // the stiffness used in shape matching
-static const float stiffness = 0.1f;
+static const float stiffness = 0.001f;
 
 // the friction factor used between two rigid bodies
 static const float rigid_friction = 0.6f;

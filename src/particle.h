@@ -12,6 +12,7 @@ public:
 	bool hasCollided;
 	btVector3 surfaceNormal;
 	btVector3 surfaceVelocity;
+    btRigidBody *surfaceBody;
 	
 	float mass;
 	btVector3 radii;
@@ -28,6 +29,8 @@ public:
 	btQuaternion predictedOrientation;
 	
 	btMatrix3x3 getMomentMatrix();
+    
+    btMatrix3x3 getInvInertiaTensorWorld();
 	
 	void init();
 	static float getSqrDistance(Particle *p1, Particle *p2);
