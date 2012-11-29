@@ -5,12 +5,13 @@ This thesis focusses on a concrete example scenario. This helps to better unders
 
 A widely applicable scenario for modeling bones and soft tissue are fingers. The scenario being used in this thesis involves two fingers grabbing onto and lifting block of the ground. The fingers are positioned to the either side of the block in the model. While applying a continuous pressure onto the block the fingers are lifting it up from the floor and into the air. This is directly applicable to a number of different scenarios involving a robotic arm with attached fingers, which is supposed to pick up blocks are other objects of the ground.
 
-image
-
-illustration of scenario
-
-image
-
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.96\textwidth]{images/robot_grabbing.png}
+\caption{Robotic hand picking objects up\protect\footnotemark}
+\label{img:robot_grabbing}
+\end{figure}
+\footnotetext{http://www.yalescientific.org/2010/12/engineering-flexible-robotic-hands/}
 
 All this has to be able to be simulated in realtime in order to be used games and animations. The simulations also has to be robust against numerically instabilities. These are either caused by simple numerical or rounding errors or by the fingers being slightly off the target when grabbing onto the block. Forces between the inner bone and outer tissue as well as forces between the tissue and other objects have to be modeled so a realistic result can be achieved. This is especially true for the friction caused by the tissue on the block, as otherwise the block would not be lift up at all.
 
