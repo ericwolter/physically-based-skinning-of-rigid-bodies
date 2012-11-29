@@ -29,7 +29,7 @@ void ParticleGroup::update()
 {
 //    cout << "particle group: " << endl;
     btVector3 currentCenterOfMass = calculateCenterOfMass();
-    btVector3 trans = currentCenterOfMass - restCenterOfMass;
+//    btVector3 trans = currentCenterOfMass - restCenterOfMass;
 //    cout << "translation: " << trans.x() << "|" << trans.y() << "|" << trans.z() << "|" << endl;
     btMatrix3x3 R = polarDecomposition(calculateMomentMatrix());
 //    cout << "R: " <<

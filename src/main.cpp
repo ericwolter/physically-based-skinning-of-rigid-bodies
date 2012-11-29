@@ -15,12 +15,16 @@ float cam_x=0.0f,cam_z=30.0f;
 float deltaAngle = 0.0f;
 float deltaMove = 0;
 
+float elapsed = 0;
+
 bool breakpoint = false;
 
 int main(int argc, char **argv) {
+    
+    cout << "time" << "\t" << "err_x" << "\t" << "err_y" << "\t" << "err_z" << endl;
 	
 	simulation = new Simulation();
-	simulation->init(true);
+	simulation->init(false);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
@@ -145,7 +149,18 @@ void timeStep() {
 			0.0f, 1.0f,  0.0f);
     
     if(!breakpoint) {
+        // logging for graph output
+        if(int(elapsed * 1000) % 10 == 0) {
+            btVector3 err = simulation->block->getCenterOfMassPosition() - btVector3(0.0f,6.5f,0.0f);
+            cout << elapsed << "\t" << err.x() << "\t" << err.y() << "\t" << err.z() << endl;
+        }
+
         simulation->step(0.001f);
+        elapsed += 0.001f;
+    }
+    
+    if(elapsed > 2) {
+        breakpoint = true;
     }
 	simulation->render();
 	

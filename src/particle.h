@@ -13,6 +13,8 @@ public:
 	btVector3 surfaceNormal;
 	btVector3 surfaceVelocity;
     btRigidBody *surfaceBody;
+    
+    btMultiSphereShape *collisionShape;
 	
 	float mass;
 	btVector3 radii;
@@ -33,6 +35,9 @@ public:
     btMatrix3x3 getInvInertiaTensorWorld();
 	
 	void init();
+    btTransform getTransform();
+    btTransform getPredictedTransform();
+    
 	static float getSqrDistance(Particle *p1, Particle *p2);
 };
 

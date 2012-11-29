@@ -25,7 +25,9 @@ public:
 	void init(bool useDeformable);
 	void step(float timeStep);
 	void render();
-	
+    
+    btRigidBody *block;
+    
 private:
 	void predictUnconstrainedMotion(float timeStep);
 	void collision(float timeStep);
@@ -55,7 +57,6 @@ private:
 	btRigidBody *ground;
 	btRigidBody *finger1;
 	btRigidBody *finger2;
-	btRigidBody *block;
 	
     CombinedBody *softFinger1;
     CombinedBody *softFinger2;

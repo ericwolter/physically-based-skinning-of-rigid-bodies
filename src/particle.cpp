@@ -11,6 +11,15 @@ void Particle::init()
     predictedOrientation = orientation;
     linearVelocity = btVector3(0,0,0);
 	angularVelocity = btVector3(0,0,0);
+    
+    const int numSpheres = 1;
+    btVector3 positions[numSpheres] = { position };
+    btScalar radi[numSpheres] = { btScalar(1) };
+    collisionShape = new btMultiSphereShape(positions, radi, numSpheres);
+    collisionShape->setLocalScaling(radii);
+    
+    btVector3 minAabb,maxAabb;
+    collisionShape->getAabb(getTransform(), minAabb, maxAabb);
 }
 
 btMatrix3x3 Particle::getMomentMatrix()
@@ -32,6 +41,21 @@ float Particle::getSqrDistance(Particle *p1, Particle *p2)
     return  (p1->position.x() - p2->position.x()) * (p1->position.x() - p2->position.x()) +
             (p1->position.y() - p2->position.y()) * (p1->position.y() - p2->position.y()) +
             (p1->position.z() - p2->position.z()) * (p1->position.z() - p2->position.z());
+}
+
+btTransform Particle::getPredictedTransform() {
+    btTransform transform = btTransform();
+    transform.setOrigin(predictedPosition);
+    transform.setRotation(predictedOrientation);
+    
+    return transform;
+}
+btTransform Particle::getTransform() {
+    btTransform transform = btTransform();
+    transform.setOrigin(position);
+    transform.setRotation(orientation);
+    
+    return transform;
 }
 
 btMatrix3x3 Particle::getInvInertiaTensorWorld() {

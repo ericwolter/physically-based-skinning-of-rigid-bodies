@@ -104,10 +104,10 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger1Transform;
         finger1Transform.setIdentity();
-        finger1Transform.setOrigin(btVector3(-3.0f,3,0.0f));
-        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.2));
+        finger1Transform.setOrigin(btVector3(-2.5f,3,0.0f));
+        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.3));
         
-        btScalar finger1Mass(10.0f);
+        btScalar finger1Mass(1.52f);
         btVector3 finger1LocalInertia(0,0,0);
         
         finger1Shape->calculateLocalInertia(finger1Mass, finger1LocalInertia);
@@ -122,10 +122,10 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger2Transform;
         finger2Transform.setIdentity();
-        finger2Transform.setOrigin(btVector3(3.0f,3,0.0f));
-        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.2));
+        finger2Transform.setOrigin(btVector3(2.5f,3,0.0f));
+        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.3));
         
-        btScalar finger2Mass(10.0f);
+        btScalar finger2Mass(1.52f);
         btVector3 finger2LocalInertia(0,0,0);
         
         finger2Shape->calculateLocalInertia(finger2Mass, finger2LocalInertia);
@@ -305,7 +305,36 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
         
         btMatrix3x3 R = btMatrix3x3(particle->predictedOrientation);
         btMatrix3x3 AInv = R * radiiMatrix * R.transpose();
-
+        
+        btCollisionObject *o = new btCollisionObject();
+        o->setWorldTransform(particle->getPredictedTransform());
+        o->setCollisionShape(particle->collisionShape);
+        btCollisionAlgorithm *algo = dispatcher->findAlgorithm(o, block);
+        btManifoldResult contactPointResult(o, block);
+        dispatchInfo.m_timeStep = timeStep;
+        dispatchInfo.m_stepCount = 0;
+        
+        algo->processCollision(o, block, dispatchInfo, &contactPointResult);
+        btManifoldArray m;
+        algo->getAllContactManifolds(m);
+        
+        for(int i=0; i<m.size();i++) {
+            
+            btPersistentManifold *contactManifold = m.at(i);
+            btCollisionObject *particleO = (btCollisionObject *)contactManifold->getBody0();
+            btRigidBody *blockBody = (btRigidBody *)contactManifold->getBody1();
+            
+            int numContacts = contactManifold->getNumContacts();
+            if(numContacts > 0)
+            {
+                for(int c = 0; c < numContacts; c++)
+                {
+                    btManifoldPoint contact = contactManifold->getContactPoint(c);
+                    cout << contact.m_positionWorldOnA << endl;
+                }
+            }
+        }
+        
         // collision with block
         btBoxShape *blockShape = (btBoxShape *)block->getCollisionShape();
         int numPlanes = blockShape->getNumPlanes();
@@ -744,11 +773,11 @@ void Simulation::predictUnconstrainedMotion(float timeStep) {
         softFinger2->predictIntegratedTransform(timeStep, softFinger2->m_rigidBody->getInterpolationWorldTransform());
 
     } else {
-        finger1->applyCentralForce(btVector3(20.0f, 10.0f, 0.0f));
+        finger1->applyCentralForce(btVector3(50.0f, 10.0f, 0.0f));
         finger1->integrateVelocities(timeStep);
         finger1->predictIntegratedTransform(timeStep, finger1->getInterpolationWorldTransform());
         
-        finger2->applyCentralForce(btVector3(-20.0f, 10.0f, 0.0f));
+        finger2->applyCentralForce(btVector3(-50.0f, 10.0f, 0.0f));
         finger2->integrateVelocities(timeStep);
         finger2->predictIntegratedTransform(timeStep, finger2->getInterpolationWorldTransform());
     }
