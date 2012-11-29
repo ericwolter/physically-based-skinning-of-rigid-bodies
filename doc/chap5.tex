@@ -1,115 +1,97 @@
-\chapter{Solution Details}
-\label{cha:solution_details}
-
-This section describes the concept and approach of the solution proposed in this thesis. It first explore the conceptual construct describing the new simulation model. This describes how the different simulations are combined and work together in the proposed system. After that the practical implementation details are described in more depth.
-
-\section{Conceptual Approach}
-\label{sec:conceptual_approach}
+\chapter{Conceptual Approach}
+\label{cha:conceptual_approach}
 
 The simulation tries to combine a traditional rigid body simulation with the simulation of deformable bodies using oriented particles. The idea is to have an object which consists of both a rigid core and a surrounding soft layer. Both these layers will be simulated using their respective dynamics system. Both the interaction of such a combined body with the world as well as the interaction between the two layers is explained using the proposed technique.
 
-\subsection{Simulation Model}
-\label{subsec:simulation_model}
+\section{Simulation Model}
+\label{sec:simulation_model}
 
 Every object in the simulation is either a combined body or a simple rigid body. The simulation model describes how these different bodies are modeled and constructed in order to enable the simulation and interaction between them. This requires both a model for rigid bodies as their used both alone as well as at the core of the combined body. Oriented particles are used for the deformable parts. Combining these two models into a unified combined body is the main contribution of this thesis.
-\subsubsection{Rigid Body}
+\subsection{Rigid Body}
 
 Simple rigid bodies are used to simulate objects which do not have or need a soft surrounding layer. Most prominently the object being picked up is for simplicity sake a simple rigid body. Also the ground doesn't need to be deformable and is thus simulated as a rigid body. These usually static rigid bodies are simulating using the traditional rigid body dynamics. They have all the usual properties of rigid bodies. The position, orientation, linear velocity and angular velocities are simulated over time. External forces, like gravity, are acting on the bodies and cause a change in velocity. The velocities are then updated in the collision resolution step using impulses. Finally the position and orientation are integrated and updated.
 
-\subsubsection{Oriented Particles}
+\subsection{Oriented Particles}
 
 The oriented particles form the deformable tissue of every combined body. They are simulated exactly like the proposed by Mueller et al.. All particles have position and velocity. After updating the velocities shape matching is used to arrive at an optimal configuration of the deformed particles. The position of the particles are than moved towards this configuration. In the final step new velocities are calculated for each particle based solely on the new position of the particle.
 
-\subsubsection{Combined Body}
-Combined bodies are more complex. These bodies are a combination of a rigid inner core with a soft outer shell. The rigid inner body behave exactly like a traditional rigid body or other non combined bodies in the simulation
+\subsection{Combined Body}
+\label{subsec:combined_body}
+Combined bodies are more complex. These bodies are a combination of a rigid inner core with a soft outer shell. The rigid inner body behaves exactly like a traditional rigid body or other non-combined bodies in the simulation. For each combined body a number of variables have to be maintained. First for the inner core the same variables as for any other rigid body are needed. These are the position of the center of mass, the orientation, the linear velocity and the angular velocity. The particles building up the soft tissue have the same variables as original oriented particles, meaning rest position, current position, rest orientation, orientation, linear velocity and angular velocity.
 
-\begin{itemize}
-\item Rigid inner body core behaving exactly like a traditional rigid body
-\item Position, orientation, linear velocity and angular velocity are simulated over time
-\item External forces like gravity act directly on rigid body and alter its state
-\item Surrounding oriented particles are divided into two groups
-\item First a group of particles with are evenly distributed across the surface of the rigid body
-\item These particles are called attached particles
-\item Attached particles provide the means to exert forces on the rigid body if the tissue is moved relative to the inner core
-\item The other group of oriented particles is arranged in any possible configuration around the attached particles
-\item These particles are called outer particles
-\item Outer particles are used to model the shape and form of the surrounding tissue
-\item The simulation places no limitation on this shape
-\item All particles, both attached and outer particles, are simulated according to the approach in the oriented particles paper
-\item The shape match constraints are implicitly defined by the connection between the different particles 
-\end{itemize}
+There are two general types of forces acting on the combined body. The first are external force, most prominently gravity. The second are internal forces occurring at the interface between the inner core and the outer tissue. External force are only applied to the inner rigid body, while the resulting changes in the tissue are simply the result of the inner force propagation. How exactly force propagation is implemented will be discussed in section \ref{subsec:force_propagation}. Another source of changes of the state of the body are collisions which will be described in detail in section \ref{subsec:collision_handling}.
+
+The particles of the deformable tissue are divided into two types. The first type is called attached particle. Attached particles are evenly distributed across the surface of the inner core. They provide the interface between the outer tissue and the inner bone. These particles are glued to the rigid body and provide the means to have force propagation from the particles to the core if the tissue or inner core are moved relatively to each other.
+
+The second type of particles are simply called outer particles. The outer particles are used to model the shape and structure of the surrounding tissue. They can be positioned and arranged in any desirable way. The simulation places to limitations on the shape of the outer tissue. The only obvious requirement is that the outer particles are well connected to the layer of the attached particles on the surface of the rigid core, as otherwise the tissue could simply separated from the bone.
+
+All particles, regardless if attached or outer particle, are simulated according to the approach described in the oriented particles paper, no modifications are needed. This also holds true for the shape matching constraints, which are defined implicitly. However the simulation again doesn't place any limitations on the way connections are modeled.
 
 \subsection{Collision Handling}
 \label{subsec:collision_handling}
 
-\begin{itemize}
-\item Two different types of collisions
-\item 1. Collision with other objects in the world
-\item 2. Collision between outer soft shell with rigid inner core
-\item Collisions with other objects is handled the exact same way as other described in the original oriented particle paper.
-\item Taking advantage of the elliptical shape of the particles they are simply moved to a non penetrating position
-\item The collision response of rigid bodies colliding with particles is not modeled as all objects are either moving and have therefore a soft tissue around them or are completely static and thus do not react to impact forces
-\item Collision between two rigid bodies are not directly modeled as all moving objects have soft tissue around them.
-\item Inner collisions work similarly but are only evaluated for the attached particles on the surface of rigid core
-\item In addition to penetrating of the inner core by the tissue pulling of the tissue has also be modeled and will be described in the the next section
-\end{itemize}
+There are three different types of collisions handled by the current simulation model.
+
+\begin{enumerate}
+\item Rigid Body $\leftrightarrow$ Rigid Body
+\item Combined Body $\leftrightarrow$ Rigid Body
+\item Outer Tissue $\leftrightarrow$ Inner Bone
+\end{enumerate}
+
+The first type of collision between two rigid bodies is handled in the traditional way. For each pair of rigid bodies a set of contact points is calculated if they are colliding. Taking into account the velocities of both bodies at each contact point and the resulting relative velocity the collision is resolved using impulses. The impulses cause a immediate change in velocity for each body. Both the resulting normal force separating the two bodies and the friction force are taken into account.
+
+The second type of collision occurs between a combined body and a rigid body. Actually this type of collision is divided into many subcollision checks comparing the particles with the planes of the rigid body. The subcollisions are only evaluated with regard to the outer particles. This is motivated by the assumption that the tissue can be compressed to such a degree that the attached particle could ever come into contact with the outer world. For each outer particle the contact points are calculated, taking advantage of the ellipsoid shape of the particles. This happens in exactly the same way as described in the original oriented particles paper, with the addition to have to compare every outer particle with every face of the rigid body. 
+
+However, the collision resolution can not directly be applied to the rigid body. The simulation model proposes a novel hybrid approach, combining the position based approach for particles with an impulse based approach for the rigid body. The collision response for the particle is exactly the same as for the general case. The penetration depth of the particle is calculated and the predicted position of the particle is simply moved out of the rigid body along the contact normal.
+
+The effect on the rigid body on the other hand is calculated using the traditional rigid body simulation. The exact same algorithm used for rigid and rigid collisions is employed. The colliding particle is simply interpreted as a rigid body and fed to the exact same algorithm used for rigid-to-rigid body collisions. The resulting force is therefore both calculated for normal direction as well as for friction. However, these forces are only applied to the rigid body and not to the particle. This approach of course is not physically correct, but yields satisfactory and plausible results.
+
+The third type of collisions between the outer soft tissue and the inner rigid bone of each combined body is modeled in a similar way to the approach taking in Position Based Dynamics. This approach and the application to the combined body is discussed in section \ref{subsec:force_propagation}. Another theoretical possible collision type not mentioned thus far is between two combined bodies which comes down to collisions between particles. This type of collision is not modeled in the current simulation model, as it lies outside the requirements.
 
 \subsection{Force Propagation}
 \label{subsec:force_propagation}
 
-\begin{itemize}
-\item Simple collision correction of the attached particles is not enough for the combined system
-\item The movement of the surrounding tissue can both create push and pull forces
-\item After the shape matching iterations only the attached particles are looked at
-\item For each particle the relative error between its final predicted position and its fixed position on the surface of the rigid inner core is calculated
-\item The magnitude of this error creates an impulse on the surface of the rigid body
-\item The impulse is applied to the fixed position of the attached particle on the surface
-\item After having applied this impulse the attached particles are directly moved to their fixed position.
-\end{itemize}
+Force propagation defines and models the forces occurring between the outer soft tissue and inner rigid bone. During the simulation the surrounding tissue and the inner core will move relative to each other, which will have to be corrected as otherwise the two parts would simply separate. The approach is modeled in a similar manner to the way Position Based Dynamics models the collision of particles with rigid bodies. The impulse used in PBD is calculated using the following formula.
 
-\section{Implementation}
+\begin{equation}
+J = m_i \Delta p_i/\Delta t
+\end{equation}
 
-\label{sec:implementation}
+This impulse is applied to the rigid body at the contact point in case there was a collision. However, for  the inner force of combined body the problem is not that simple. In case of the combined body only the attached particles have to be evaluated, again under the assumption that the tissue can not be deformed enough to cause the outer particles to collide with the inner core. After all shape matching iterations have finished the attached particles have a final predicted position. However, this position is most likely not on the surface of inner rigid body. They either end up inside the core or further away. The case of being inside is exactly the same as the collision case described in PBD which results in a push force on the rigid body. The case of settling away from the surface, however should also result in a force, more specifically the core should be pulled towards the attached particle. In order to calculate the correct impulse for both cases the attached particles are realigned to their position on the surface which causes a response in the rigid body. Calculating the correct impulse first requires $\Delta p_i$, which can be obtained by comparing the current predicted position $x_p$ with the rest position $x_r$ on the surface of core relative to the core's current transformation in world space $T$.
 
-\begin{itemize}
-\item Implementation combines rigid body simulation and oriented particles
-\item Using bullet library for the managing the rigid body state
-\item Includes forces, integrating velocities, and predicting unconstrained motion
-\item Bullet is also used for applying impulses generated by the tissue and finally updating the rigid bodies state
-\item Oriented particles implementation is completely custom
-\end{itemize}
+\begin{align}
+x_r &= T\bar{x}_r \\
+\Delta p_i &= x_p - x_r
+\end{align}
 
-\subsection{Setup}
-\begin{itemize}
-\item Settings up the environment
-\item In total four bodies are simulated
-\item ground, 2 fingers, cylinder
-\item ground is a simple static rigid body and does not move are react to force during the simulation
-\item fingers and cylinder are all combined bodies
-\item Setting up a combined body
-\item Each inner rigid body has a arbitrarily chosen mass
-\item The underlying geometric structure is used to evenly distribute attached particles across its surface
-\item The density of the attached particles can be controlled by a configurable $density$parameter
-\item For each attached particle on the surface a corresponding outer particle is generated
-\item The outer particle is positioned along the same vector as its corresponding attached particle relative to the center of mass of the rigid inner core
-\item The distance between attached and outer particle can be controlled by a configurable $extrude$ parameter
-\item After all the particles have been added to the surrounding tissue the implicit shape matching groups are generated
-\item The size of each group is a configurable $groupSize$ parameter
-\item For each particle the $n = groupSize - 1$ closest particles using simple euclidean distance are added to an implicit group with this particle at the center
-\item In addition to the closest particles the corresponding attached or outer particle is also added to the group
-\item Thus the group size for each particle becomes exactly $groupSize$
-\end{itemize}
-\subsection{Loop}
-\begin{itemize}
-\item For all active bodies gravity is applied and the velocities updated
-\item After that an unconstrained motion is predicted
-\item Both the rigid body is temporarily moved to a new position as well as all the particles belonging to the body
-\item This predicts both the positions and orientations
-\item Predicted position of particles are adjusted in case of potential collisions
-\item Gauss-Seidel type iterations are performed a configurable number of times in order to resolve the shape matching constraints
-\item After arriving at the final shape matched configuration of predicted position and orientation for the particles, the error between the fixed position of attached particle and their predicted position is evaluated
-\item For each error an impulse is applied to the predicted transform of the rigid body
-\item After applying the impulses the predicted position and orientation of the attached particles is forcefully set to their fixed position and orientation relative to position of the rigid body
-\item In the final step the the position/orientation of the rigid body and all particles is updated to their new values
-\end{itemize}
+Here $\bar{x}_r$ denotes the relative position of the particle relative to the resting transform of the cube. The resulting impulse is than directly applied to the $x_r$ on the body. In the final step the predicted position of all attached particles is forcefully set to $x_r$, so that they appear glued to the surface of the inner rigid core.
 
+\section{Requirements}
+
+In chapter \ref{cha:problem_analysis} a number of main requirements were defined. All of these requirements can now be compared and validated against the proposed simulation model, as described in chapter \ref{cha:conceptual_approach}.
+
+\paragraph{1. Realtime Simulation}
+
+As arguably the most important requirement, the real time aspect of the overall simulation is directly dependent on the performance of the individual subsimulations. The system includes a complete, although simplistic, rigid body simulation. Rigid body simulations are relatively straightforward and have been around for a long time. A huge number of bodies can be simulated reliable and in real time. So this subcomponent meets the requirement implicitly. The other subcomponent is a direct application of the concepts introduced by the oriented particles paper. The goal of this paper was also the real time applicability of the deformable simulation. This important characteristic was proven by the authors quite successfully. So another component passes the requirement implicitly. 
+
+The two major additions are the collision resolution between outer particles and rigid bodies and the force propagation inside the combined body. The force propagation is of linear complexity and has only to be calculated for a rather limited number of attached particles. Thus it doesn't have any significant impact on the real time requirement.
+
+The collision resolution between concerning the outer particles is the most computationally intensive component. Each particle has to be compared against every face of the rigid body. Fortunately this can basically be reduced to a collision detection between to rigid bodies with all possible optimizations. The calculations are in fact even easier than that because the particles are perfect ellipsoids with reduces the required comparisons significantly.
+
+All components contributing to the overall simulation are capable of real time. Thus the overall simulation will run in realtime and the requirement is fulfilled.
+
+\paragraph{2. Low Number of Bodies}
+
+The first step in reducing the number of bodies in the simulation was already taken by the oriented particles approach, which allows to simulate fewer particles overall and especially in sparse regions. By using the rigid core for the combined body the number of particles can be further reduced as the internal structure no longer has to be modeled using particles. In the practice these inner particles might not even be deformed at all as the external force are not large enough and are thus needlessly consume resources. Using the soft surrounding layer enables the tissue to wrap around the other object. This increases the contact area between the two bodies and reduces the need to model the same scenario with multiple rigid bodies connected by joints.
+
+\paragraph{3. Only Approximate Orientation of Finger Relative to Object}
+
+By enabling the soft tissue to wrap and deform around other objects the contact area between the bodies is increased which allows for more stable simulations. Using rigid bodies for the same tasks can result in numerical instabilities because of the way collisions are detected and resolved. This is especially for completely non trivial shapes where because of the rasterization the perfect solutions can not always be found. The deformable tissue solves this as it can smooth out these instabilities over time.
+
+\paragraph{4. Force Propagation Inside Body Between Tissue and Bone}
+
+The force propagation inside the body is explicitly modeled and described in section \ref{subsec:force_propagation}. Permanently attached particles on the surface of the bone propagate the forces resulting from changes of the surrounding tissue. Thus the tissue is always firmly glued to the bone and nothing can drift apart.
+
+\paragraph{5. Friction Between Finger and Object}
+
+The ways force are handled between oriented particles and rigid bodies is explicitly modeled and describe in section \ref{subsec:collision_handling}. Friction is only acting on the rigid body but not on the particles. Although this is not at all physically it behaves plausible and believable.

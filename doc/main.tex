@@ -1,10 +1,10 @@
 %BCOR: BindeKorrektur. Sie macht den Rand auf der Seite an der das
 %      Werk gebunden wird größer.
-%DIV:  ist bei einer 12pt schrift standardmäßig auf 12 eingestellt, und
+%DIV:  ist bei einer 11pt schrift standardmäßig auf 10 eingestellt, und
 %      ist ein Maß für den beschreibbaren bereich. Je größer der Wert,
 %      desto größer der schreibbare Bereich und desto kleiner die
 %      Ränder
-\documentclass[BCOR15mm,DIV10,12pt,twoside,appendixprefix,final,
+\documentclass[a4paper,twoside,12pt,DIV10,BCOR=15mm,appendixprefix,final,
 							 accentcolor=tud5b,colorback,longdoc,bigchapter,firstlineindent]{tudreport}
 
 %Deutsche Rechtschreibung und Schriftarteinstellungen
@@ -46,6 +46,9 @@
 
 %Literaturverzeichnis (Stil der Referencen)
 \usepackage[square,sort&compress]{natbib}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
 
 % Pfad entlang dem die Bilder gesucht werden.
 \graphicspath{{images/}}
@@ -153,6 +156,7 @@ Technische Universität Darmstadt, 2010
 \include{chap5}
 \include{chap6}
 \include{chap7}
+\include{chap8}
 
 % Literaturverzeichnis einfügen
 \cleardoublepage

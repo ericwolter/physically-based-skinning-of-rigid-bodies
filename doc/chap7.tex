@@ -1,2 +1,36 @@
-\chapter{Conclusions}
-\label{cha:conclusions}
+\chapter{Evaluation}
+\label{cha:evaluation}
+
+\begin{itemize}
+\item Describing scenario
+\item Two fingers try to pick up a cylinder of the floor
+\item Pressure onto the cylinder results in friction and the ability to pick up the cylinder
+\item Comparing traditional simple rigid body simulation with new combined body approach
+\item Simulation using three simple blocks of rigid bodies
+\item Simulation fails because the cylinder is pushed out of the two fingers
+\item Simulation using the proposed combined bodies
+\item Tissue wraps around are cylinder providing a larger contact area
+\item The friction at contact area enables fingers to pick up cylinder
+\end{itemize}
+
+%\begin{figure}[h]
+%	\centering
+%	\begin{tikzpicture}
+%		\begin{axis}[xlabel=$time$,ylabel=$distance$]
+%			\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/rigid_bullet_custom.txt};
+%			\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/rigid_bullet_custom.txt};
+%			\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/rigid_bullet_custom.txt};
+%		\end{axis}
+%	\end{tikzpicture}
+%\end{figure}
+%
+%\begin{figure}[h]
+%	\centering
+%	\begin{tikzpicture}
+%		\begin{axis}[xlabel=$time$,ylabel=$distance$]
+%			\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/soft_custom.txt};
+%			\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/soft_custom.txt};
+%			\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/soft_custom.txt};
+%		\end{axis}
+%	\end{tikzpicture}
+%\end{figure}
