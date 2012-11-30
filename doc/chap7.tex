@@ -1,28 +1,113 @@
 \chapter{Evaluation}
 \label{cha:evaluation}
 
-\begin{itemize}
-\item Describing scenario
-\item Two fingers try to pick up a cylinder of the floor
-\item Pressure onto the cylinder results in friction and the ability to pick up the cylinder
-\item Comparing traditional simple rigid body simulation with new combined body approach
-\item Simulation using three simple blocks of rigid bodies
-\item Simulation fails because the cylinder is pushed out of the two fingers
-\item Simulation using the proposed combined bodies
-\item Tissue wraps around are cylinder providing a larger contact area
-\item The friction at contact area enables fingers to pick up cylinder
-\end{itemize}
+This section uses the application described in chapter \ref{cha:solution_details} in order to simulate various demo scenarios. For each scenario both the naive approach of just using rigid bodies is compared against the approach proposed in this thesis. The general layout of the scenario is always the same. At the center of the simulated world sits a block modeled as a simple rigid body. To both sides of this block are fingers. In the naive approach these fingers are also simple rigid bodies. 
 
-%\begin{figure}[h]
-%	\centering
-%	\begin{tikzpicture}
-%		\begin{axis}[xlabel=$time$,ylabel=$distance$]
-%			\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/rigid_bullet_custom.txt};
-%			\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/rigid_bullet_custom.txt};
-%			\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/rigid_bullet_custom.txt};
-%		\end{axis}
-%	\end{tikzpicture}
-%\end{figure}
+For the other approach both fingers are implemented using the combination of a rigid inner bone and a soft outer tissue. The fingers are simulated in such a way that they apply a constant force both in the direction of the block as well as in the upward direction. These two forces combined are then enough to lift the block up from ground. For each scenario a couple of small variations are tested in order to better understand and compare the implications of both types of approaches. The results for each simulation are compared using the offset of the block. For each simulation step the offset of the block's center of mass to its starting position's center of mass is calculated. The three coordinates are than plotted in order to provide an easily understandable visualization of the simulation results. 
+
+Each different scenario is explained and illustrated on the following pages.
+
+\clearpage
+
+\paragraph{Scenario 1}
+In this scenario the fingers are perfectly aligned numerically with the block. This means the faces of the fingers are exactly perpendicular to the faces of the block. The block is a small box standing upright, comparable to a can.
+
+\begin{figure}[htbp]
+	\centering
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	\subfigure[rigid fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+	\subfigure[combined fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+\end{figure}
+
+\clearpage
+\paragraph{Scenario 2}
+The second scenario modifies the position of the fingers slightly. The fingers are now slightly rotated so they are not perfectly perpendicular anymore. Instead they positioned more realistically like real fingers extending from the hand. This should make it harder for the rigid fingers to hold the block in center. The block itself remains unchanged to scenario 1.
+
+\begin{figure}[htbp]
+	\centering
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	\subfigure[rigid fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+	\subfigure[combined fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+\end{figure}
+
+\clearpage
+\paragraph{Scenario 3}
+For the third scenario the block is made longer to be similar to a pen. The higher center of mass will make it harder to keep the block in between the fingers.
+
+\begin{figure}[htbp]
+	\centering
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	\subfigure[rigid fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+	\subfigure[combined fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+\end{figure}
+
+\clearpage
+\paragraph{Scenario 4}
+
+
 %
 %\begin{figure}[h]
 %	\centering

@@ -81,7 +81,7 @@ Here $L(t)$ denotes the angular momentum. $I(t)$ is called the inertia tensor an
 
 Combining all the state variables with impulses yields the basic foundation for a rigid body simulation. A simplistic version of the simulation loop can for example look like this:
 
-\begin{algorithm}[h!]
+\begin{algorithm}[htbp]
 \caption{Rigid Body Simulation Loop}
 \begin{algorithmic}[1]
 \FORALL{bodies $b$}
@@ -173,7 +173,7 @@ All particles are than moved to their respective goal positions by a variable fr
 
 Position based dynamics is a method which omits the traditional force based approach simulate dynamics systems but instead directly works on the positions to simulate deformable objects. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. But instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. Also as the name implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the the pseudocode of the simulation loop.
 
-\begin{algorithm}[h!]
+\begin{algorithm}[htbp]
 \caption{Position based dynamics simuation}
 \begin{algorithmic}[1]
 \FORALL{vertices $i$}
@@ -339,14 +339,14 @@ c(x) = x^\top A x - 1
 The potential contact point has to meet the following two constraints
 
 \begin{align}
-\bigtriangledown c(x)&=\lambda n \\
+\nabla c(x)&=\lambda n \\
 c(x) &= 0
 \end{align}
 
 In addition to these two constraints the following two formulas yield enough information to solve for $\lambda$ and $x$, though only $x$ is of real interest.
 
 \begin{align}
-\bigtriangledown c(x)&=2 A x \\
+\nabla c(x)&=2 A x \\
 A = R \begin{bmatrix}\frac{1}{a^2} & 0 & 0 \\ 0 & \frac{1}{b^2} & 0 \\ 0 & 0 & \frac{1}{c^2}\end{bmatrix} R^\top &\Rightarrow A^{-1} = R \begin{bmatrix}a^2 & 0 & 0 \\ 0 & b^2 & 0 \\ 0 & 0 & c^2\end{bmatrix}R^\top
 \end{align}
 
