@@ -49,7 +49,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, halfExtents.y(), -halfExtents.z()+z);
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -63,7 +63,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(0,0,1), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -77,7 +77,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, halfExtents.z());
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -91,7 +91,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(halfExtents.x(), -halfExtents.y()+y, -halfExtents.z()+z);
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(0,0,1), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -105,7 +105,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y()+y, -halfExtents.z());
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -119,7 +119,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                     p->mass = particleMass;
                     p->radii = btVector3(0.3f, 0.1f, 0.3f);
                     p->relativePosition = btVector3(-halfExtents.x()+x, -halfExtents.y(), -halfExtents.z()+z);
-                    p->position = origin + p->relativePosition;
+                    p->position = m_rigidBody->getWorldTransform() * p->relativePosition;
                     p->orientation = btQuaternion(btVector3(1,0,0), 0*(M_PI/180));
                     addAttachedParticle(p);
                 }
@@ -131,8 +131,7 @@ CombinedBody::CombinedBody(btRigidBody *rigidBody)
                 Particle *oP = new Particle();
                 oP->mass = particleMass;
                 oP->radii = btVector3(0.3f, 0.1f, 0.3f);
-                btVector3 origin = this->m_rigidBody->getWorldTransform().getOrigin();
-                oP->position = origin + ((*p)->position - origin) * extrude;
+                oP->position = origin + (((*p)->position - origin) * extrude);
                 oP->orientation = (*p)->orientation;
                 addOuterParticle(oP);
             }

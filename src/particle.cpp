@@ -12,19 +12,11 @@ void Particle::init()
     linearVelocity = btVector3(0,0,0);
 	angularVelocity = btVector3(0,0,0);
     
-    const int numSpheres = 1;
-    btVector3 positions[numSpheres] = { position };
-    btScalar radi[numSpheres] = { btScalar(1) };
-    collisionShape = new btMultiSphereShape(positions, radi, numSpheres);
-    collisionShape->setLocalScaling(radii);
-    
-    btVector3 minAabb,maxAabb;
-    collisionShape->getAabb(getTransform(), minAabb, maxAabb);
+    radiiMatrix = btMatrix3x3(radii.x() * radii.x(), 0, 0, 0, radii.y() * radii.y(), 0, 0, 0, radii.z() * radii.z());
 }
 
 btMatrix3x3 Particle::getMomentMatrix()
 {
-    btMatrix3x3 radiiMatrix = btMatrix3x3(radii.x() * radii.x(), 0, 0, 0, radii.y() * radii.y(), 0, 0, 0, radii.z() * radii.z());
     btMatrix3x3 R = btMatrix3x3(orientation);
     
     btScalar tmp = mass/5;

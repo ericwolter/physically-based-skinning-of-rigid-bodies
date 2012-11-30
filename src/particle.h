@@ -10,14 +10,10 @@ public:
 	~Particle();
 	
 	bool hasCollided;
-	btVector3 surfaceNormal;
-	btVector3 surfaceVelocity;
-    btRigidBody *surfaceBody;
     
-    btMultiSphereShape *collisionShape;
-	
 	float mass;
 	btVector3 radii;
+    btMatrix3x3 radiiMatrix;
 	btVector3 restPosition;
 	btVector3 relativePosition;
 	btQuaternion restOrientation;

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "main.h"
+#include "constants.h"
 
 // angle of rotation for the camera direction
 float cam_angle=0.0;
@@ -150,16 +151,16 @@ void timeStep() {
     
     if(!breakpoint) {
         // logging for graph output
-        if(int(elapsed * 1000) % 10 == 0) {
-            btVector3 err = simulation->block->getCenterOfMassPosition() - btVector3(0.0f,6.5f,0.0f);
+        if(int(elapsed * 1/stepSize) % 10 == 0) {
+            btVector3 err = simulation->block->getCenterOfMassPosition() - btVector3(0.0f,3.5f,0.0f);
             cout << elapsed << "\t" << err.x() << "\t" << err.y() << "\t" << err.z() << endl;
         }
 
-        simulation->step(0.001f);
-        elapsed += 0.001f;
+        simulation->step(stepSize);
+        elapsed += stepSize;
     }
     
-    if(elapsed > 2) {
+    if(elapsed > 10) {
         breakpoint = true;
     }
 	simulation->render();
