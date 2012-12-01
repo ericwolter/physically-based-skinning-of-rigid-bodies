@@ -30,12 +30,12 @@ One major functionality integrated into the CombinedBody class is the initializa
 \begin{figure}[htb]
   \centering
   \subfigure[$density = 1$]{
-      \includegraphics[width=.3\textwidth]{images/combined_body_density_1.pdf}
+      \includegraphics[width=.35\textwidth]{images/combined_body_density_1.pdf}
      \label{subfig:combined_body_density_1}
   }
 \hspace{2cm}
   \subfigure[$density = 2$]{
-      \includegraphics[width=.3\textwidth]{images/combined_body_density_2.pdf}
+      \includegraphics[width=.35\textwidth]{images/combined_body_density_2.pdf}
      \label{subfig:combined_body_density_2}
   }
   \label{fig:combined_body_density}
@@ -95,3 +95,13 @@ This section illustrates the simulation step executed for each time step. It onl
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
+
+The first step of the loop applies all external forces to all bodies in the simulated world. The particles in the tissue layer of the combined bodies this directly modifies the velocity of each particle directly. The velocities of the inner rigid body and all other rigid bodies in the scene are than integrated separately using the provided functions from bullet. After that the position and orientation of all bodies and particles are predicted so that potential collisions can be resolved.
+
+The different types of collisions are all detected and resolved separately. First all outer particles are checked against the ground and if necessary their respective predicted state adjusted. After that follows the collision resolution with the block in between the two fingers. This step not only modifies and redefines the predicted state of the outer particles but potentially also applies the required impulses to the rigid body of the block, including both the normal forces as well as the forces caused by friction.
+
+Having adjusted the predicted state for all outer particles due to potential collisions the algorithm now starts with the gauss-seidel iterations. The concrete iteration count is set to low single digit number, which seems to provide a good balance between performance and robustness. For each iterations all shape matching groups are updated and the particles partially moved to their calculated goal positions. These updates affect all particles, both outer particles but also attached particles. This step is identical to the way shape matching is implemented in the original oriented particles paper \cite{Muller:2011gn}.
+
+After the final predicted positions for all particles the attached particles are realigned with their true position on surface of the bone. This process also propagates the impulses caused by the moving tissue onto the inner rigid body. After the required impulse has been calculated and applied all attached particles are snapped back to their position on the surface.
+
+The next step simply resolves all potential collisions between purely rigid bodies in the world. These bodies might potentially include the velocities they received from the collision with oriented particles. The final step in the loop than integrates all bodies and particles forward in time, updating both the positions and orientations of everything according to the modifications caused by the intermediary collisions and shape matching. This new state is than used in the next time step to rerun the loop form the beginning.

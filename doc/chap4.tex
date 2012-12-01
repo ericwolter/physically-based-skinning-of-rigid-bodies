@@ -10,15 +10,15 @@ The following section gives a short introduction to rigid bodies simulations lar
 
 Rigid bodies simulations are very similar to simple particle simulations. Simple particles are modeled as infinitesimal point masses, rigid bodies additional are defined by their dimension. This extension in space remains constant through out the whole simulation. A rigid body can therefore be thought of like a set of many particles. If a force is acting on any one of these point masses all the other connected masses in the rigid body are affected as well. Each point mass has a fixed mass $m_i$ and is located at fixed position $r_i$ inside the system. The total mass of the rigid body is then simply the sum of all the point masses combined
 
-\[
+\begin{equation}
 M = \sum\limits_{i=1}^N m_i
-\]
+\end{equation}
 
 The position of the particles is defined relative to a local body coordinate system. The origin of coordinate system is the center of mass of the rigid body. The center of mass is calculated as 
 
-\[
+\begin{equation}
 c = \frac{\sum m_i r_i}{M}
-\]
+\end{equation}
 
 In order to describe a rigid body simulation two variables are of central importance. First is the position \(x(t)\) of the rigid body in space. The second is the orientation \(q(t)\)in space. Both these variables are defined in relation to the world coordinate system. There are two different approaches to model the orientation of the rigid body, either a rotation matrix $R(t)$ or a unit quaternion $q(t)$. In practice in almost all cases unit quaternions are used for a number of reasons. One important aspect is the fact that quaternions don't suffer from gimbal lock like simple Euler angles do. Another aspect is that a quaternion consists of only 4 numbers instead of the 9 numbers required for a full rotation matrix. This second point leads to both easier and more efficient calculations, especially for interpolation and normalization.
 
@@ -35,15 +35,15 @@ The physics behind the rigid body simulation is based on Newton's laws of motion
 
 The position of the rigid body is defined by the position $x(t)$ of its center of mass in world coordinates over time. The change of this position over time defines the linear velocity $v(t)$ for the body. So the linear velocity is simply the following.
 
-\[
+\begin{equation}
 v(t) = \dot{x}(t)
-\]
+\end{equation}
 
 The angular velocity is a little harder to define. First the current rotation of the body has to be stated. The orientation of the rigid body was defined as unit quaternion $q(t)$. The change in orientation can than be calculated with the following .
 
-\[
+\begin{equation}
 \dot{q}(t) = \omega(t) * q(t)
-\]
+\end{equation}
 
 Here $\omega(t)$ denotes the angular velocity of the body at any point in time. Both the linear velocity and the angular velocity are integrated in every time step to simulate the bodies behavior.
 
@@ -59,25 +59,25 @@ v &, \text{the linear velocity} \\
 
 Until now only the state of the rigid body has been defined. In the real world force are acting upon the body which cause a change in its state according to Newton's laws of motion. The most prominent force usually modeled in a rigid body simulations are for example gravity, collision and friction. In the real world force always act over a defined amount of time. Unfortunately for the simulation an instantaneous change in velocity is more desirable, so that for example in the case of collision the relative velocity of the involved bodies comes to a hold immediately. In order to achieve this goal the new quantity $J$ is introduced. $J$ is called an impulse and represents a force integrated over time.
 
-\[
+\begin{equation}
 F \Delta t = J
-\]
+\end{equation}
 
 Letting $F$ go to infinity and $\Delta t$ to zero describes how the force would change the velocity if it would cause an immediate change. $J$ thus has the units of momentum. 
 
 Again the effects of any impulse has to be evaluated for both the linear velocity as well as the angular velocity. For the linear velocity the change is rather defined as
 
-\[
- v(t) = \frac{P(t)}{M}
-\]
+\begin{equation}
+v(t) = \frac{P(t)}{M}
+\end{equation}
 
 In this case $P(t)$ denotes the linear momentum aggregated across all force acting upon the body and $M$ is simply the mass of the rigid body.
 
 The formula for the angular velocity again is a little more involved
 
-\[
+\begin{equation}
 \omega(t) = L(t) * inv(I(t))
-\]
+\end{equation}
 
 Here $L(t)$ denotes the angular momentum. $I(t)$ is called the inertia tensor and is a simple scaling factor between the angular momentum $L(t)$ and $\omega(t)$ just like $inv(M)$ is in the linear case. The inertia tensor describes how the mass of the body is distributed relative to the body's center of mass. It depends on the orientation of the body but not on the translation.
 
@@ -238,21 +238,21 @@ This moment matrix $A$ in terms of $n$ particles each with a corresponding mass 
 
 As in the original shape matching the goal is to find the optimal translation vector $t$ and rotation matrix $R$, which map the original shape to the current configuration in a least squares manner. The optimal translation vector can simply be calculated from the differences of the two centers of mass.
 
-\[
+\begin{equation}
 t = c - \bar{c}
-\]
+\end{equation}
 
 The rotation matrix $R$ can be obtained by calculating the polar decomposition of $A$
 
-\[
+\begin{equation}
 A = R*S
-\]
+\end{equation}
 
 Together with translation vector $t$ and the extracted rotation matrix $R$ the goal positions for each particle can be calculated.
 
-\[
+\begin{equation}
 g_i = R(\bar{x}_i-\bar{c})+c
-\]
+\end{equation}
 
 Thus far this is still exactly the same as in the original shape matching approach. Unfortunately  the moment matrix $A$ can become ill-conditioned are even singular. This happens if the particle are close to co-planar or as in the example of the twisting chain co-linear. If $A$ is ill-conditioned the polar decomposition is not well defined and yields only unusable and unstable results. Thus no reliable $R$ can be obtained. Adding the orientation information for each particle into the calculation can fix this problem.
 
@@ -314,20 +314,20 @@ In practice a Gauss-Seidel type iteration scheme is used to satisfy all shape ma
 Another improvement oriented particles provide is a more accurate collision handling. Each oriented particle is no longer a simple sphere but instead is modeled as an ellipsoid.
 
 \begin{figure}[htb]
-  \centering
-  \subfigure[Sphere collision]{
-      \includegraphics[width=.3\textwidth]{images/oriented_particles_collision_sphere.pdf}
-     \label{subfig:collision_sphere}
-  }
-  \subfigure[Incorrect ellipsoid collision]{
-      \includegraphics[width=.3\textwidth]{images/oriented_particles_collision_ellipsoid_wrong.pdf}
-     \label{subfig:collision_ellipsoid_incorrect}
-  }
-  \subfigure[Correct ellipsoid collision]{
-      \includegraphics[width=.3\textwidth]{oriented_particles_collision_ellipsoid_correct.pdf}
-     \label{subfig:collision_ellipsoid_correct}
-  }
-  \label{fig:collision_handling}
+	\centering
+	\subfigure[Sphere collision]{
+		\includegraphics[width=.3\textwidth]{oriented_particles_collision_sphere.pdf}
+		\label{subfig:collision_sphere}
+	}
+	\subfigure[Incorrect ellipsoid collision]{
+		\includegraphics[width=.3\textwidth]{oriented_particles_collision_ellipsoid_wrong.pdf}
+		\label{subfig:collision_ellipsoid_incorrect}
+	}
+	\subfigure[Correct ellipsoid collision]{
+		\includegraphics[width=.3\textwidth]{oriented_particles_collision_ellipsoid_correct.pdf}
+		\label{subfig:collision_ellipsoid_correct}
+	}
+	\label{fig:collision_handling}
 \end{figure}
 
 Ellipsoids can fit better to the surface area of a model than simplistic spheres. Using sphere might cause unnatural frictions or other visual artifacts. The question now remains how to calculate the correct spot on the surface of the ellipsoid that collided with a plane as can be seen in figure \ref{subfig:collision_ellipsoid_correct}. The simplistic approach used in the spherical case can not be directly transferred as illustrated in figure \ref{subfig:collision_sphere} and \ref{subfig:collision_ellipsoid_incorrect}. This would only work if the contact normal is aligned to the principal axis of the ellipsoid. However, in almost all cases this is not the case and the calculation becomes a little bit more involved.

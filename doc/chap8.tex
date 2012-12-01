@@ -1,8 +1,13 @@
 \chapter{Conclusions}
 \label{cha:conclusions}
 
-\begin{itemize}
-\item friction on oriented particles
-\item collision between oriented particles
-\item extending structure of the tissue
-\end{itemize}
+This thesis presented a method to simulate both rigid bodies and deformable particles together in one single model. It combined a rigid inner bone with a soft outer tissue. The tissue is able to deform around other rigid bodies in the world and thus increase the contact area enabling more robust simulations. The method extends the oriented particles approach in various ways. Two types of interface between rigid bodies and oriented particles were defined. The collision interface between oriented particles and rigid bodies on the outside of body was resolved, including friction acting on the rigid body. The second interface is inside the combined body itself were the force caused by the moving tissue were propagated to the inner bone. Finally various demo scenarios showed how the method is able to robustly simulate picking up small object.
+
+The method is well suited to simulate these simple scenarios and is open to extension. Currently, friction between rigid bodies and oriented particles is only calculated and applied for the rigid body. Applying the correct forces to the particles as well would probably result in even more plausible and robust simulations.
+
+Furthermore the collision between two combined bodies has been completely omitted for simplicity. Oriented particles already have the capabilities to calculate and resolve collisions in between two particles. This easy extension would allow for more complex scenario where for example two combined bodies completely flow around another object, or the object being picked up is itself deformable like a soft ball for example. In addition collisions of particles inside the combined body would enable more complex tissue structures.
+
+Another interesting topic for further investigating is the automatic distribution of particles both across the surface of the inner bone as well as the overall structure of the tissue. The current implementation is limited to a simple box shaped bone with a rather simplistic outer tissue. Extending this to handle more complex bone structures would more realistic simulations.
+
+The current demo application also suffers from some performance issues as it was only implemented as a proof of concept. Many performance improvement can be implemented easily. The original oriented particles paper already proved the realtime characteristics of this type of particle simulation. There is no reason that the additions introduced in this thesis will hinder this requirement in any way
+
