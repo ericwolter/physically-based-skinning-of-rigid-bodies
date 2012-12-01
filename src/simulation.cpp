@@ -43,11 +43,11 @@ void Simulation::init(bool useDeformable) {
     ground = new btRigidBody(groundInfo);
     
     // setup block
-    btCollisionShape *blockShape = new btBoxShape(btVector3(1.0f, 3.0f, 1.0f));
+    btCollisionShape *blockShape = new btBoxShape(btVector3(1.0f, 6.0f, 6.0f));
     
     btTransform blockTransform;
     blockTransform.setIdentity();
-    blockTransform.setOrigin(btVector3(0.0f,3.5f,0.0f));
+    blockTransform.setOrigin(btVector3(0.0f,6.5f,0.0f));
     
     btScalar blockMass(0.01f);
     btVector3 blockLocalInertia(0,0,0);
@@ -106,8 +106,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger1Transform;
         finger1Transform.setIdentity();
-        finger1Transform.setOrigin(btVector3(-2.5f,3,0.0f));
-        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.0));
+        finger1Transform.setOrigin(btVector3(-3.5f,3,0.0f));
+        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.1));
         
         btScalar finger1Mass(1.52f);
         btVector3 finger1LocalInertia(0,0,0);
@@ -124,8 +124,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger2Transform;
         finger2Transform.setIdentity();
-        finger2Transform.setOrigin(btVector3(2.5f,3,0.0f));
-        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.0));
+        finger2Transform.setOrigin(btVector3(3.5f,3,0.0f));
+        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.1));
         
         btScalar finger2Mass(1.52f);
         btVector3 finger2LocalInertia(0,0,0);
@@ -209,6 +209,37 @@ void Simulation::realignAttachedParticles(float timeStep, CombinedBody *body) {
         bodyVelocity = body->m_rigidBody->getLinearVelocity();
         particle->predictedPosition = truePosition;
     }
+}
+
+// see: http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test
+bool Simulation::quickCollisionCheck(btRigidBody *body, Particle *particle) {
+    
+    // axis aligned bounding box of the body
+    btVector3 a, b;
+    body->getAabb(a, b);
+    
+    // center c and radius r of particle sphere
+    btVector3 c = particle->predictedPosition;
+    btScalar r = particle->radii[particle->radii.maxAxis()];
+    
+    float dist_squared = pow(r,2);
+    if (c.x() < a.x()) {
+        dist_squared -= pow(c.x() - a.x(), 2);
+    } else if (c.x() > b.x()) {
+        dist_squared -= pow(c.x() - b.x(), 2);
+    }
+    if (c.y() < a.y()) {
+        dist_squared -= pow(c.y() - a.y(), 2);
+    } else if (c.y() > b.y()) {
+        dist_squared -= pow(c.y() - b.y(), 2);
+    }
+    if (c.z() < a.z()) {
+        dist_squared -= pow(c.z() - a.z(), 2);
+    } else if (c.z() > b.z()) {
+        dist_squared -= pow(c.z() - b.z(), 2);
+    }
+    
+    return dist_squared > 0;
 }
 
 void Simulation::softCollisionWithGround(float timeStep, CombinedBody *body) {
@@ -301,7 +332,7 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
             float d2 = n.dot(x2);
 
             if(d1 < d2) {
-                if(blockShape->isInside(bodyX1, 0.00001f)) {
+                if(blockShape->isInside(bodyX1, margin)) {
                     particle->hasCollided = true;
                     btVector3 delta = n * (d - d1);
                     particle->predictedPosition += delta;
@@ -320,7 +351,7 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
                     block->applyImpulse((particle->mass * -delta) / timeStep, t.getOrigin() - x1);
                 }
             } else {
-                if (blockShape->isInside(bodyX2, 0.00001f)) {
+                if (blockShape->isInside(bodyX2, margin)) {
                     particle->hasCollided = true;
                     btVector3 delta = n * (d - d2);
                     particle->predictedPosition += delta;
@@ -374,7 +405,7 @@ void Simulation::collision(float timeStep) {
         }
     }
            
-    for(int s = 0; s < 4; s++)
+    for(int s = 0; s < 1; s++)
     {
        int numManifolds = manifoldArray.size();
        for(int i = 0; i < numManifolds; i++)
@@ -716,22 +747,22 @@ void Simulation::integrateTransforms(float timeStep) {
     
     if(useDeformable) {
         btVector3 fv1 = softFinger1->m_rigidBody->getLinearVelocity();
-        softFinger1->m_rigidBody->setLinearVelocity(btVector3(fv1.x() < 0 ? 0 : fv1.x(), fv1.y(),0));
+        softFinger1->m_rigidBody->setLinearVelocity(btVector3(fv1.x() < 0 ? 0 : fv1.x(), fv1.y() < 0 ? 0: fv1.y(),0));
         softFinger1->m_rigidBody->setAngularVelocity(btVector3(0, 0,0));
         softFinger1->integrateTransforms(timeStep);
         btVector3 fv2 = softFinger2->m_rigidBody->getLinearVelocity();
-        softFinger2->m_rigidBody->setLinearVelocity(btVector3(fv2.x() > 0 ? 0 : fv2.x(), fv1.y(),0));
+        softFinger2->m_rigidBody->setLinearVelocity(btVector3(fv2.x() > 0 ? 0 : fv2.x(), fv1.y() < 0 ? 0: fv1.y(),0));
         softFinger2->m_rigidBody->setAngularVelocity(btVector3(0, 0,0));
         softFinger2->integrateTransforms(timeStep);
     } else {
         btVector3 fv1 = finger1->getLinearVelocity();
-        finger1->setLinearVelocity(btVector3(fv1.x() < 0 ? 0: fv1.x(),fv1.y(),0));
+        finger1->setLinearVelocity(btVector3(fv1.x() < 0 ? 0 : fv1.x(),fv1.y(),0));
         finger1->setAngularVelocity(btVector3(0,0,0));
         finger1->predictIntegratedTransform(timeStep, predictedTrans);
         finger1->proceedToTransform(predictedTrans);
         
         btVector3 fv2 = finger2->getLinearVelocity();
-        finger2->setLinearVelocity(btVector3(fv2.x() > 0 ? 0: fv2.x(),fv1.y(),0));
+        finger2->setLinearVelocity(btVector3(fv2.x() > 0 ? 0 : fv2.x(),fv1.y(),0));
         finger2->setAngularVelocity(btVector3(0,0,0));
         finger2->predictIntegratedTransform(timeStep, predictedTrans);
         finger2->proceedToTransform(predictedTrans);

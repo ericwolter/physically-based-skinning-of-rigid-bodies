@@ -34,6 +34,7 @@ private:
     
     CollisionResponse collisionResolution(float timeStep, btVector3 contactPoint, btVector3 contactNormal, btScalar contactDepth, btVector3 p1, btVector3 p2, btVector3 v1, btVector3 v2, btVector3 a1, btVector3 a2, btScalar invM1, btScalar invM2, btMatrix3x3 invT1, btMatrix3x3 invT2);
     
+    bool quickCollisionCheck(btRigidBody *body, Particle *particle);
     void softCollisionWithGround(float timeStep, CombinedBody *body);
     void softCollisionWithBlock(float timeStep, CombinedBody *body);
 	void integrateTransforms(float timeStep);
