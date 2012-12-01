@@ -15,31 +15,35 @@ In this scenario the fingers are perfectly aligned numerically with the block. T
 \begin{figure}[htb]
 	\centering
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario1_rigid}
 	  }
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario1_combined}
 	  }
 	\subfigure[rigid fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario1_rigid.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario1_rigid.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario1_rigid.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\subfigure[combined fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario1_combined.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario1_combined.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario1_combined.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\caption{Evaluation Scenario 1}
 \end{figure}
+
+For this idealistic scenario the simple rigid body simulation still performs very well.   The $\Delta y$ is slowly accelerating upwards, while $\Delta x$ and $\Delta z$ stay very close to zero. The exact same is also true for the combined body simulation which also performs as expected. Unfortunately in the real world the relative position of the bodies is seldom this perfect. Most of the times the mesh of the objects is a triangular mesh and the collisions can not be resolved this cleanly. In addition the angles between the fingers and the object will almost never be perfectly perpendicular. In these more complex scenarios the simple rigid body simulation is expected to fail while the deformable body should continue to perform well.
 
 \clearpage
 \paragraph{Scenario 2}
@@ -48,31 +52,35 @@ The second scenario modifies the position of the fingers slightly. The fingers a
 \begin{figure}[htb]
 	\centering
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario2_rigid}
 	  }
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario2_combined}
 	  }
 	\subfigure[rigid fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario2_rigid.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario2_rigid.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario2_rigid.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\subfigure[combined fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario2_combined.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario2_combined.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario2_combined.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\caption{Evaluation Scenario 2}
 \end{figure}
+
+The provided graphs of the offset of the block clearly show how the rigid body simulation starts to slowly breakdown. A small increase in $\Delta z$ shows how the block is slowly pushed out of the fingers. The block eventually slips from the grasp of the finger and starts to fall. The block than lands on its side which explains the negative $\Delta y$. The combined body simulation on the other hand maintains its performance almost perfectly. There is a smaller jitter\footnote{$Var(\Delta z)=0.029899771$} in $\Delta z$ where the block starts to slip but is then almost immediately realigned by the soft tissue. The higher the center of mass of the block the larger this small slipping motion becomes, the next scenario explores how well the combined body simulation can cope with longer blocks.
 
 \clearpage
 \paragraph{Scenario 3}
@@ -81,61 +89,69 @@ For the third scenario the block is made longer to be similar to a pen. The high
 \begin{figure}[htb]
 	\centering
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario3_rigid}
 	  }
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario3_combined}
 	  }
 	\subfigure[rigid fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario3_rigid.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario3_rigid.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario3_rigid.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\subfigure[combined fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario3_combined.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario3_combined.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario3_combined.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\caption{Evaluation Scenario 3}
 \end{figure}
 
+Comparing the rigid fingers to the previous scenario clearly shows how the higher center of mass accelerate the occurrence of the slipping event. The blocks starts to fall sooner and again lands on its side. The combined body simulation on the other hand can handle this scenario just as well as before showing almost no difference. The small jitter \footnote{$Var(\Delta z)=0.033401526$} observed in the previous scenario is a little stronger now as the center of mass has more space to tilt, however it is always realigned by the particles resulting in an almost flat line for $\Delta x$ and $\Delta z$.
+
 \clearpage
 \paragraph{Scenario 4}
-The fourth scenario increases the size of the block even more. This ensures that the contact are between the fingers and the block is larger and that at all times multiple oriented particle collision have to be resolved.
+The fourth scenario the size of the block has been enlarged so that  it is larger than the surface of the connecting fingers. The soft tissue of the fingers can now no longer surround the completely block but only conforms to the surface.
 
 \begin{figure}[htb]
 	\centering
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario4_rigid}
 	  }
 	  \subfigure{
-	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	      \includegraphics[width=.48\textwidth]{scenario4_combined}
 	  }
 	\subfigure[rigid fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario4_rigid.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario4_rigid.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario4_rigid.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\subfigure[combined fingers]{
 		\begin{tikzpicture}
-			\begin{axis}[xlabel=$time$,ylabel=$distance$]
-				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
-				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
-				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\begin{axis}[xlabel=$time$,ylabel=$delta$,legend pos=north west]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/scenario4_combined.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/scenario4_combined.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/scenario4_combined.txt};
+				\legend{$\Delta x$,$\Delta y$,$\Delta z$}
 			\end{axis}
 		\end{tikzpicture}
 	}
 	\caption{Evaluation Scenario 4}
 \end{figure}
+
+The results for this scenario are interesting. The rigid body simulation performs surprisingly well. The reason for this behavior is the fact that the block now can no longer be pushed out of the two fingers and just the very small edge connecting to the surface is enough to lift the block up. The combined simulation is also interesting as the it starts of performing well but some noise is introduced towards the end of the 10 second window, where $\Delta x$ and $\Delta y$ start to jitter a lot causing the finger to temporarily losing contact. This results in a decrease in the upward acceleration. Unfortunately it seems that some numerical in stabilities are causing the simulation to become less robust.  

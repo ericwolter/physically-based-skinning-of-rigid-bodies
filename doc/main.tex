@@ -45,7 +45,7 @@
 \renewcommand{\listalgorithmname}{Liste der Algorithmen}
 
 %Literaturverzeichnis (Stil der Referencen)
-\usepackage[square,sort&compress]{natbib}
+%\usepackage[square,sort&compress]{natbib}
 
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -110,7 +110,7 @@ gsclogofull%
 %}
 
 \lowertitleback{%
-Technische Universität Darmstadt, 2010
+Technische Universität Darmstadt, 2012
 }
 
 %\settitlepicture{%
@@ -134,11 +134,11 @@ Technische Universität Darmstadt, 2010
 \pagenumbering{roman}
 \tableofcontents
 \listoffigures
-\listoftables
+%\listoftables
 
 % sofern vorhanden, einkommentieren:
 \listofalgorithms
-\include{symbolverzeichnis}
+%\include{symbolverzeichnis}
 \newcounter{roman_counter}
 \setcounter{roman_counter}{\value{page}}
 
@@ -160,9 +160,9 @@ Technische Universität Darmstadt, 2010
 
 % Literaturverzeichnis einfügen
 \cleardoublepage
-\bibliographystyle{abbrv}
-\addcontentsline{toc}{chapter}{\textbf{Literaturverzeichnis}}
-%\bibliography{bibdatabase}
+\bibliographystyle{eg-alpha}
+\addcontentsline{toc}{chapter}{\textbf{Bibliography}}
+\bibliography{bibdatabase}
 \cleardoublepage
 
 % Bei Bedarf kann der Anhang noch römische Ziffern erhalten...

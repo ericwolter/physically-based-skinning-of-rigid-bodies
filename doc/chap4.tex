@@ -6,7 +6,9 @@ This section describes the fundamental buildings blocks of the algorithm describ
 \section{Rigid Body Simulations}
 \label{sec:rigid_body_simulations}
 
-Rigid bodies simulations is very similar to simple particle simulations. Simple particles are modeled as infinitesimal point masses, rigid bodies additional are defined by their dimension. This extension in space remains constant through out the whole simulation. A rigid body can therefore be thought of like a set of many particles. If a force is acting on any one of these point masses all the other connected masses in the rigid body are affected as well. Each point mass has a fixed mass $m_i$ and is located at fixed position $r_i$ inside the system. The total mass of the rigid body is then simply the sum of all the point masses combined
+The following section gives a short introduction to rigid bodies simulations largely based on work by Baraff in \cite{Baraff:1997uh} and \cite{Baraff:1997wq}. These notes also form the basis for the rigid body parts implemented as part of the demo application provided by this thesis.
+
+Rigid bodies simulations are very similar to simple particle simulations. Simple particles are modeled as infinitesimal point masses, rigid bodies additional are defined by their dimension. This extension in space remains constant through out the whole simulation. A rigid body can therefore be thought of like a set of many particles. If a force is acting on any one of these point masses all the other connected masses in the rigid body are affected as well. Each point mass has a fixed mass $m_i$ and is located at fixed position $r_i$ inside the system. The total mass of the rigid body is then simply the sum of all the point masses combined
 
 \[
 M = \sum\limits_{i=1}^N m_i
@@ -106,7 +108,7 @@ Combining all the state variables with impulses yields the basic foundation for 
 \section{Shape Matching}
 \label{sec:shape_matching}
 
-Shape Matching is an geometrically motivated approach to simulating deformable objects. It describes objects as a collection of points and does not need connectivity informations. By trading in physical correctness the technique is able to provide an unconditionally stable simulation. 
+Shape Matching is an geometrically motivated approach to simulating deformable objects and was invented by M{\"u}ller et al. in \cite{Muller:2005fi}. It describes objects as a collection of points and does not need connectivity informations. By trading in physical correctness the technique is able to provide an unconditionally stable simulation. 
 
 The main concept of this deformable model is to replace the system of forces and energies between the different particles by simple geometric constraints and distances. All points are moved to goal positions which are obtained by shape matching the original rest state of the object to the currently deformed state of the object. These well-defined goal positions are computationally easy to obtain and provide an unconditionally stable simulation.
 
@@ -171,7 +173,7 @@ All particles are than moved to their respective goal positions by a variable fr
 \section{Position Based Dynamics}
 \label{sec:position_based_dynamics}
 
-Position based dynamics is a method which omits the traditional force based approach simulate dynamics systems but instead directly works on the positions to simulate deformable objects. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. But instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. Also as the name implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the the pseudocode of the simulation loop.
+Position based dynamics is a method which omits the traditional force based approach simulate dynamics systems but instead directly works on the positions to simulate deformable objects and was proposed by M{\"u}ller et al. in \ref{Muller:2007vs}. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. But instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. Also as the name implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the the pseudocode of the simulation loop.
 
 \begin{algorithm}[htb]
 \caption{Position Based Dynamics Simulation Loop}
@@ -201,7 +203,7 @@ The first key insight into the algorithm occurs in lines 9-11. Here positions fo
 \section{Oriented Particles}
 \label{sec:oriented_particles}
 
-Oriented particles combines the geometrical based approach of shape matching with the idea of updating the velocities based on the positions alone as described in position based dynamics. The specifically improves upon shape matching in sparse regions increasing the overall stability of the shape matching. Modeling the particles as oriented ellipsoids can approximate the surface more accurately than simple sphere which is especially useful in calculating and resolving collisions.
+Oriented particles as described by M{\"u}ller et al. \ref{Muller:2011gn} combines the geometrical based approach of shape matching with the idea of updating the velocities based on the positions alone as described in position based dynamics. They specifically improves upon shape matching in sparse regions increasing the overall stability of the shape matching. Modeling the particles as oriented ellipsoids can approximate the surface more accurately than simple sphere which is especially useful in calculating and resolving collisions.
 
 \subsection{Generalized Shape Matching}
 The main idea is to use oriented particles that in addition to the position and velocity also store rotation and spin. The particles now all have orientation information associated with them, thus the name of the method. The variables for each particle thus are now extended to encompass the following seven variables.
@@ -254,7 +256,7 @@ g_i = R(\bar{x}_i-\bar{c})+c
 
 Thus far this is still exactly the same as in the original shape matching approach. Unfortunately  the moment matrix $A$ can become ill-conditioned are even singular. This happens if the particle are close to co-planar or as in the example of the twisting chain co-linear. If $A$ is ill-conditioned the polar decomposition is not well defined and yields only unusable and unstable results. Thus no reliable $R$ can be obtained. Adding the orientation information for each particle into the calculation can fix this problem.
 
-The solution involves defining a well-conditioned moment matrix for even single particle and consequently adding each moment matrix together in order to arrive at a total moment matrix for the whole particle group. In order to arrive at this result lets begin with two groups of particles, each with their own unknown moment matrix $A_1$ and $A_2$ respectively. Both moment matrices are defined with respect to their own center of mass and thus can not simply be added to arrive at the combined moment matrix. As described in Rivers and James equation \ref{eq:minimize_oriented_particle} can be reformulated to the following formula which shifts the center of mass to the global one.
+The solution involves defining a well-conditioned moment matrix for even single particle and consequently adding each moment matrix together in order to arrive at a total moment matrix for the whole particle group. In order to arrive at this result lets begin with two groups of particles, each with their own unknown moment matrix $A_1$ and $A_2$ respectively. Both moment matrices are defined with respect to their own center of mass and thus can not simply be added to arrive at the combined moment matrix. As described in Rivers et al. \cite{Rivers:2007te} equation \ref{eq:minimize_oriented_particle} can be reformulated to the following formula which shifts the center of mass to the global one.
 
 \begin{equation}
 A = \sum\limits_i^n m_ix_i\bar{x}_i^\top - Mc\bar{c}^\top
