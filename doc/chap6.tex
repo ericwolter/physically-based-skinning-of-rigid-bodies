@@ -27,7 +27,7 @@ The CombinedBody class holds all the information required for the proposed two p
 
 One major functionality integrated into the CombinedBody class is the initialization of the soft outer tissue. Also the structure of the oriented particles is in the tissue is arbitrary as far as the simulation is concerned a concrete sample implementation is provided. The underlying geometric structure chosen relies on an evenly distributed number of so called attached particles across the surface of the inner rigid body. Currently only a version for box-like shaped bodies is provided. The layout algorithm for the attached particles starts by iterating over all faces of the box. An attached particles is added for each corner. Then depending on a customizable density parameter additional particles are added to each edge. Finally the rest of the face is filled according to the grid defined by the particles on the corners and edges. An illustration of this can be seen in figure \ref{fig:combined_body_density}.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
   \centering
   \subfigure[$density = 1$]{
       \includegraphics[width=.3\textwidth]{images/combined_body_density_1.pdf}
@@ -57,7 +57,7 @@ The Particle class holds all the required state variables for an oriented partic
 
 This section illustrates the simulation step executed for each time step. It only shows the loop as it is implemented for the deformable scenario. The scenario with only rigid bodies is essentially identical to the sample loop provided in section \ref{sec:rigid_body_simulations} about rigid body simulations.
 
-\begin{algorithm}[htbp!]
+\begin{algorithm}[htb!]
 \caption{Combined Body Simulation Loop}
 \begin{algorithmic}[1]
 \FORALL{bodies $b_{all}$}

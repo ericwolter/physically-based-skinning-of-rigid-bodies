@@ -12,7 +12,7 @@ Each different scenario is explained and illustrated on the following pages.
 \paragraph{Scenario 1}
 In this scenario the fingers are perfectly aligned numerically with the block. This means the faces of the fingers are exactly perpendicular to the faces of the block. The block is a small box standing upright, comparable to a can.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	  \subfigure{
 	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
@@ -38,13 +38,14 @@ In this scenario the fingers are perfectly aligned numerically with the block. T
 			\end{axis}
 		\end{tikzpicture}
 	}
+	\caption{Evaluation Scenario 1}
 \end{figure}
 
 \clearpage
 \paragraph{Scenario 2}
 The second scenario modifies the position of the fingers slightly. The fingers are now slightly rotated so they are not perfectly perpendicular anymore. Instead they positioned more realistically like real fingers extending from the hand. This should make it harder for the rigid fingers to hold the block in center. The block itself remains unchanged to scenario 1.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	  \subfigure{
 	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
@@ -70,13 +71,14 @@ The second scenario modifies the position of the fingers slightly. The fingers a
 			\end{axis}
 		\end{tikzpicture}
 	}
+	\caption{Evaluation Scenario 2}
 \end{figure}
 
 \clearpage
 \paragraph{Scenario 3}
 For the third scenario the block is made longer to be similar to a pen. The higher center of mass will make it harder to keep the block in between the fingers.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	  \subfigure{
 	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
@@ -102,20 +104,38 @@ For the third scenario the block is made longer to be similar to a pen. The high
 			\end{axis}
 		\end{tikzpicture}
 	}
+	\caption{Evaluation Scenario 3}
 \end{figure}
 
 \clearpage
 \paragraph{Scenario 4}
+The fourth scenario increases the size of the block even more. This ensures that the contact are between the fingers and the block is larger and that at all times multiple oriented particle collision have to be resolved.
 
-
-%
-%\begin{figure}[h]
-%	\centering
-%	\begin{tikzpicture}
-%		\begin{axis}[xlabel=$time$,ylabel=$distance$]
-%			\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/soft_custom.txt};
-%			\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/soft_custom.txt};
-%			\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/soft_custom.txt};
-%		\end{axis}
-%	\end{tikzpicture}
-%\end{figure}
+\begin{figure}[htb]
+	\centering
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	  \subfigure{
+	      \includegraphics[width=.48\textwidth]{images/placeholder.png}
+	  }
+	\subfigure[rigid fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+	\subfigure[combined fingers]{
+		\begin{tikzpicture}
+			\begin{axis}[xlabel=$time$,ylabel=$distance$]
+				\addplot [color=red,mark=false,smooth,thick] table[x=time,y=err_x] {data/placeholder.txt};
+				\addplot [color=green,mark=false,smooth,thick] table[x=time,y=err_y] {data/placeholder.txt};
+				\addplot [color=blue,mark=false,smooth,thick] table[x=time,y=err_z] {data/placeholder.txt};
+			\end{axis}
+		\end{tikzpicture}
+	}
+	\caption{Evaluation Scenario 4}
+\end{figure}

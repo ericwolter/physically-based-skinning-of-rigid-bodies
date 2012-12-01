@@ -20,7 +20,7 @@ c = \frac{\sum m_i r_i}{M}
 
 In order to describe a rigid body simulation two variables are of central importance. First is the position \(x(t)\) of the rigid body in space. The second is the orientation \(q(t)\)in space. Both these variables are defined in relation to the world coordinate system. There are two different approaches to model the orientation of the rigid body, either a rotation matrix $R(t)$ or a unit quaternion $q(t)$. In practice in almost all cases unit quaternions are used for a number of reasons. One important aspect is the fact that quaternions don't suffer from gimbal lock like simple Euler angles do. Another aspect is that a quaternion consists of only 4 numbers instead of the 9 numbers required for a full rotation matrix. This second point leads to both easier and more efficient calculations, especially for interpolation and normalization.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=.4\textwidth]{images/rigid_body_1.pdf}
 \caption{Rigid body model illustration}
@@ -81,7 +81,7 @@ Here $L(t)$ denotes the angular momentum. $I(t)$ is called the inertia tensor an
 
 Combining all the state variables with impulses yields the basic foundation for a rigid body simulation. A simplistic version of the simulation loop can for example look like this:
 
-\begin{algorithm}[htbp]
+\begin{algorithm}[htb]
 \caption{Rigid Body Simulation Loop}
 \begin{algorithmic}[1]
 \FORALL{bodies $b$}
@@ -173,8 +173,8 @@ All particles are than moved to their respective goal positions by a variable fr
 
 Position based dynamics is a method which omits the traditional force based approach simulate dynamics systems but instead directly works on the positions to simulate deformable objects. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. But instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. Also as the name implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the the pseudocode of the simulation loop.
 
-\begin{algorithm}[htbp]
-\caption{Position based dynamics simuation}
+\begin{algorithm}[htb]
+\caption{Position Based Dynamics Simulation Loop}
 \begin{algorithmic}[1]
 \FORALL{vertices $i$}
 	\STATE{initalize $x_i=\bar{x}_i, v_i =\bar{v}_i, w_i = 1/m_i$}
@@ -218,7 +218,7 @@ v_i &, \text{the linear velocity} \\
 
 The advantages to include orientations for each particle become particular evident in sparse regions of the model like for example chains of particles or even single particles. The traditional approach of using spherical particles to model twisting chains would involve adding many particles to capture the twist. In order to model the same scenario with oriented particles only a single particle is required as the twisting is completely captured in the rotation and spin of the particle.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=.5\textwidth]{images/oriented_particle_twist_chain.png}
 \caption{Oriented particle twisting chain}
@@ -311,7 +311,7 @@ In practice a Gauss-Seidel type iteration scheme is used to satisfy all shape ma
 
 Another improvement oriented particles provide is a more accurate collision handling. Each oriented particle is no longer a simple sphere but instead is modeled as an ellipsoid.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
   \centering
   \subfigure[Sphere collision]{
       \includegraphics[width=.3\textwidth]{images/oriented_particles_collision_sphere.pdf}
