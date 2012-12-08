@@ -5,19 +5,25 @@
 #include "main.h"
 #include "constants.h"
 
-// angle of rotation for the camera direction
-float cam_angle=0.0;
-// actual vector representing the camera's direction
-float cam_lx=0.0f,cam_lz=-1.0f;
-// XZ position of the camera
-float cam_x=0.0f,cam_z=30.0f;
-// the key states. These variables will be zero
-//when no key is being presses
-float deltaAngle = 0.0f;
-float deltaMove = 0;
+
+// polar coordinates of camera
+float cam_radius = 20.0f;
+float cam_phi = M_PI_2; // 80 degrees;
+float cam_theta = M_PI_2; // 90 degrees;
+
+float cam_speed = 2.0f;
+
+float eye_x = 0.0f;
+float eye_y = 0.0f;
+float eye_z = 0.0f;
+
+float center_x = 0.0f;
+float center_y = 0.0f;
+float center_z = 0.0f;
+
+btVector3 rest;
 
 float elapsed = 0;
-
 bool breakpoint = true;
 
 int main(int argc, char **argv) {
@@ -25,7 +31,13 @@ int main(int argc, char **argv) {
     cout << "time" << "\t" << "err_x" << "\t" << "err_y" << "\t" << "err_z" << endl;
 	
 	simulation = new Simulation();
-	simulation->init(true);
+	simulation->init(false);
+    
+    center_x = simulation->block->getCenterOfMassPosition().x();
+    center_y = simulation->block->getCenterOfMassPosition().y();
+    center_z = simulation->block->getCenterOfMassPosition().z();
+    
+    rest = simulation->block->getCenterOfMassPosition();
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
@@ -37,10 +49,6 @@ int main(int argc, char **argv) {
 	glutReshapeFunc(reshape);
 	glutIdleFunc(timeStep);
 	glutKeyboardFunc(keyboard);
-	
-	glutSpecialFunc(specialKeyPress);
-	glutIgnoreKeyRepeat(1);
-	glutSpecialUpFunc(specialKeyRelease);
 	
 	glEnable(GL_DEPTH_TEST);
 	
@@ -86,17 +94,10 @@ int main(int argc, char **argv) {
 }
 
 void reshape(GLint w, GLint h) {
-	
-	if (h == 0) {
-		h = 1;
-	}
-	
-	float ratio = 1.0 * w / h;
-	
+	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glViewport(0, 0, w, h);
-	gluPerspective(45, ratio, 1, 1000);
+	gluPerspective(65.0, (float)w / (float)h, 0.1, 100);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -107,52 +108,50 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0);
 	} else if (key == 32) {
         breakpoint = breakpoint ? false : true;
+    } else if (key == 'w') {
+        center_z += 0.2f * cam_speed;
+    } else if (key == 's') {
+        center_z -= 0.2f * cam_speed;
+    } else if (key == 'd') {
+        center_x -= 0.2f * cam_speed;
+    } else if (key == 'a') {
+        center_x += 0.2f * cam_speed;
+    } else if (key == 'e') {
+        center_y += 0.2f * cam_speed;
+    } else if (key == 'q') {
+        center_y -= 0.2f * cam_speed;
+    } else if (key == 'i') {
+        cam_phi -= 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'k') {
+        cam_phi += 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'l') {
+        cam_theta -= 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'j') {
+        cam_theta += 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'u') {
+        cam_radius += 0.2f * cam_speed;
+    } else if (key == 'o') {
+        cam_radius -= 0.2f * cam_speed;
     }
-}
-
-void specialKeyPress(int key, int x, int y) {
-	
-	switch (key) {
-		case GLUT_KEY_LEFT : deltaAngle = -0.01f; break;
-		case GLUT_KEY_RIGHT : deltaAngle = 0.01f; break;
-		case GLUT_KEY_UP : deltaMove = 0.5f; break;
-		case GLUT_KEY_DOWN : deltaMove = -0.5f; break;
-	}
-}
-
-void specialKeyRelease(int key, int x, int y) {
-
-	switch (key) {
-		case GLUT_KEY_LEFT :
-		case GLUT_KEY_RIGHT : deltaAngle = 0.0f;break;
-		case GLUT_KEY_UP :
-		case GLUT_KEY_DOWN : deltaMove = 0;break;
-	}
 }
 
 void timeStep() {
 	
-	if (deltaMove) {
-		cam_x += deltaMove * cam_lx * 0.1f;
-		cam_z += deltaMove * cam_lz * 0.1f;
-	}
-	if (deltaAngle) {
-		cam_angle += deltaAngle;
-		cam_lx = sin(cam_angle);
-		cam_lz = -cos(cam_angle);
-	}
-	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+    eye_x = center_x + sinf(cam_phi) * cos(cam_theta) * cam_radius;
+    eye_z = center_z + sinf(cam_phi) * sinf(cam_theta) * cam_radius;
+    eye_y = center_y + cosf(cam_phi) * cam_radius;
+    
 	glLoadIdentity();
-	gluLookAt(cam_x, 1.0f, cam_z,
-			cam_x+cam_lx, 1.0f,  cam_z+cam_lz,
+	gluLookAt(eye_x, eye_y, eye_z,
+			center_x, center_y,  center_y,
 			0.0f, 1.0f,  0.0f);
     
     if(!breakpoint) {
         // logging for graph output
         if(int(elapsed * 1/stepSize) % 100 == 0) {
-            btVector3 err = simulation->block->getCenterOfMassPosition() - btVector3(0.0f,6.5f,0.0f);
+            btVector3 err = simulation->block->getCenterOfMassPosition() - rest;
             cout << elapsed << "\t" << err.x() << "\t" << err.y() << "\t" << err.z() << endl;
         }
 

@@ -51,6 +51,7 @@ private:
 	void drawParticleGroup(ParticleGroup &g);
 	void drawParticle(Particle &p);
     
+    btConstraintSolver* solver;
 	btDefaultCollisionConfiguration *collisionConfiguration;
     btCollisionDispatcher* dispatcher;
     btDispatcherInfo dispatchInfo;

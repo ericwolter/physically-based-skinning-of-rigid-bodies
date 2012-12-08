@@ -43,11 +43,11 @@ void Simulation::init(bool useDeformable) {
     ground = new btRigidBody(groundInfo);
     
     // setup block
-    btCollisionShape *blockShape = new btBoxShape(btVector3(1.0f, 6.0f, 6.0f));
+    btCollisionShape *blockShape = new btBoxShape(btVector3(1.0f, 3.0f, 1.0f));
     
     btTransform blockTransform;
     blockTransform.setIdentity();
-    blockTransform.setOrigin(btVector3(0.0f,6.5f,0.0f));
+    blockTransform.setOrigin(btVector3(0.0f,3.5f,0.0f));
     
     btScalar blockMass(0.01f);
     btVector3 blockLocalInertia(0,0,0);
@@ -66,7 +66,7 @@ void Simulation::init(bool useDeformable) {
         btTransform softFinger1Transform;
         softFinger1Transform.setIdentity();
         softFinger1Transform.setOrigin(btVector3(-3.5,3,0));
-        softFinger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.1));
+        softFinger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.0));
         
         btScalar softFinger1Mass(1.0f);
         btVector3 softFinger1LocalInertia(0,0,0);
@@ -86,7 +86,7 @@ void Simulation::init(bool useDeformable) {
         btTransform softFinger2Transform;
         softFinger2Transform.setIdentity();
         softFinger2Transform.setOrigin(btVector3(3.5,3,0));
-        softFinger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.1));
+        softFinger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.0));
         
         btScalar softFinger2Mass(1.0f);
         btVector3 softFinger2LocalInertia(0,0,0);
@@ -106,8 +106,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger1Transform;
         finger1Transform.setIdentity();
-        finger1Transform.setOrigin(btVector3(-3.5f,3,0.0f));
-        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.1));
+        finger1Transform.setOrigin(btVector3(-2.5f,3,0.0f));
+        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.0f));
         
         btScalar finger1Mass(1.52f);
         btVector3 finger1LocalInertia(0,0,0);
@@ -124,8 +124,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger2Transform;
         finger2Transform.setIdentity();
-        finger2Transform.setOrigin(btVector3(3.5f,3,0.0f));
-        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.1));
+        finger2Transform.setOrigin(btVector3(2.5f,3,0.0f));
+        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.0f));
         
         btScalar finger2Mass(1.52f);
         btVector3 finger2LocalInertia(0,0,0);
@@ -405,7 +405,7 @@ void Simulation::collision(float timeStep) {
         }
     }
            
-    for(int s = 0; s < 1; s++)
+    for(int s = 0; s < 4; s++)
     {
        int numManifolds = manifoldArray.size();
        for(int i = 0; i < numManifolds; i++)
@@ -552,9 +552,10 @@ void Simulation::drawFinger1() {
 		glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, color);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, speccolor);
 		glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 100.0);
+    
 		glTranslatef(position.x(), position.y(), position.z());
-        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
+        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
 		glutSolidCube(1.0f);
 	glPopMatrix();
 }
@@ -573,9 +574,10 @@ void Simulation::drawFinger2() {
         glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, color);
         glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, speccolor);
         glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 100.0);
+    
         glTranslatef(position.x(), position.y(), position.z());
-        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
+        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glutSolidCube(1.0f);
 	glPopMatrix();
 }
@@ -596,8 +598,8 @@ void Simulation::drawBlock() {
         glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 100.0);
         
         glTranslatef(position.x(), position.y(), position.z());
-        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
+        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
         glutSolidCube(1.0f);
 	glPopMatrix();
 }
@@ -611,15 +613,16 @@ void Simulation::drawSoftFinger(CombinedBody *finger) {
 	btVector3 fullExtents = shape->getHalfExtentsWithoutMargin() * 2;
     
 	glPushMatrix();
-    float color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, speccolor);
-    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 100.0);
-    glTranslatef(position.x(), position.y(), position.z());
-    glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
-    glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
-    glutSolidCube(1.0f);
+        float color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, color);
+        glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+        glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, speccolor);
+        glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 100.0);
+    
+        glTranslatef(position.x(), position.y(), position.z());
+        glRotatef(rot_angle*(180/M_PI), rot_axis.x(), rot_axis.y(), rot_axis.z());
+        glScalef(fullExtents.x(), fullExtents.y(), fullExtents.z());
+        glutSolidCube(1.0f);
 	glPopMatrix();
     
     vector<ParticleGroup*>::iterator g;
@@ -729,11 +732,11 @@ void Simulation::predictUnconstrainedMotion(float timeStep) {
         softFinger2->predictIntegratedTransform(timeStep, softFinger2->m_rigidBody->getInterpolationWorldTransform());
 
     } else {
-        finger1->applyCentralForce(btVector3(20.0f, 10.0f, 0.0f));
+        finger1->applyCentralForce(btVector3(50.0f, 10.0f, 0.0f));
         finger1->integrateVelocities(timeStep);
         finger1->predictIntegratedTransform(timeStep, finger1->getInterpolationWorldTransform());
         
-        finger2->applyCentralForce(btVector3(-20.0f, 10.0f, 0.0f));
+        finger2->applyCentralForce(btVector3(-50.0f, 10.0f, 0.0f));
         finger2->integrateVelocities(timeStep);
         finger2->predictIntegratedTransform(timeStep, finger2->getInterpolationWorldTransform());
     }
