@@ -8,7 +8,7 @@
 
 // polar coordinates of camera
 float cam_radius = 20.0f;
-float cam_phi = M_PI_2; // 80 degrees;
+float cam_phi = M_PI_2; // 90 degrees;
 float cam_theta = M_PI_2; // 90 degrees;
 
 float cam_speed = 2.0f;
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     cout << "time" << "\t" << "err_x" << "\t" << "err_y" << "\t" << "err_z" << endl;
 	
 	simulation = new Simulation();
-	simulation->init(false);
+	simulation->init(body_type);
     
     center_x = simulation->block->getCenterOfMassPosition().x();
     center_y = simulation->block->getCenterOfMassPosition().y();
@@ -97,7 +97,7 @@ void reshape(GLint w, GLint h) {
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(65.0, (float)w / (float)h, 0.1, 100);
+	gluPerspective(65.0, (float)w / (float)h, 0.01, 100);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -121,13 +121,13 @@ void keyboard(unsigned char key, int x, int y) {
     } else if (key == 'q') {
         center_y -= 0.2f * cam_speed;
     } else if (key == 'i') {
-        cam_phi -= 0.0174532925f * cam_speed; // 1 degree;
-    } else if (key == 'k') {
-        cam_phi += 0.0174532925f * cam_speed; // 1 degree;
-    } else if (key == 'l') {
         cam_theta -= 0.0174532925f * cam_speed; // 1 degree;
-    } else if (key == 'j') {
+    } else if (key == 'k') {
         cam_theta += 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'l') {
+        cam_phi -= 0.0174532925f * cam_speed; // 1 degree;
+    } else if (key == 'j') {
+        cam_phi += 0.0174532925f * cam_speed; // 1 degree;
     } else if (key == 'u') {
         cam_radius += 0.2f * cam_speed;
     } else if (key == 'o') {
@@ -139,9 +139,9 @@ void timeStep() {
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-    eye_x = center_x + sinf(cam_phi) * cos(cam_theta) * cam_radius;
-    eye_z = center_z + sinf(cam_phi) * sinf(cam_theta) * cam_radius;
-    eye_y = center_y + cosf(cam_phi) * cam_radius;
+    eye_x = center_x + sinf(cam_theta) * cos(cam_phi) * cam_radius;
+    eye_z = center_z + sinf(cam_theta) * sinf(cam_phi) * cam_radius;
+    eye_y = center_y + cosf(cam_theta) * cam_radius;
     
 	glLoadIdentity();
 	gluLookAt(eye_x, eye_y, eye_z,

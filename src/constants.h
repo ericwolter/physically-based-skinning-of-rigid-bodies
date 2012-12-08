@@ -1,6 +1,14 @@
 #ifndef __Thesis__constants__
 #define __Thesis__constants__
 
+#include <BulletDynamics/btBulletDynamicsCommon.h>
+
+// the scenario to setup
+#define SCENARIO 4
+
+// the body type used - false = rigid, true = combined
+static const bool body_type = false;
+
 // the step size used for the simulation loop
 static const float stepSize = 0.001f;
 
@@ -21,6 +29,55 @@ static const float margin = 0.0001f;
 static const float stiffness = 0.01f;
 
 // the friction factor used between two rigid bodies
-static const float rigid_friction = 0.6f;
+static const float rigid_friction = 0.5f;
+
+#if (SCENARIO == 1)
+static const btVector3 pos_rigid_finger1 = btVector3(-2.5f, 3.0f, 0.0f);
+static const btVector3 pos_rigid_finger2 = btVector3(2.5f, 3.0f, 0.0f);
+static const btScalar angle_rigid_finger1 = 0.0f;
+static const btScalar angle_rigid_finger2 = -0.0f;
+static const btVector3 pos_combined_finger1 = btVector3(-3.5f, 3.0f, 0.0f);
+static const btVector3 pos_combined_finger2 = btVector3(3.5f, 3.0f, 0.0f);
+static const btScalar angle_combined_finger1 = 0.0f;
+static const btScalar angle_combined_finger2 = -0.0f;
+static const btVector3 size_block = btVector3(1.0f, 3.0f, 1.0f);
+static const btVector3 pos_block = btVector3(0.0f, 3.5f, 0.0f);
+#endif
+#if (SCENARIO == 2)
+static const btVector3 pos_rigid_finger1 = btVector3(-2.5f, 3.0f, 0.0f);
+static const btVector3 pos_rigid_finger2 = btVector3(2.5f, 3.0f, 0.0f);
+static const btScalar angle_rigid_finger1 = 0.3f;
+static const btScalar angle_rigid_finger2 = -0.3f;
+static const btVector3 pos_combined_finger1 = btVector3(-3.5f, 3.0f, 0.0f);
+static const btVector3 pos_combined_finger2 = btVector3(3.5f, 3.0f, 0.0f);
+static const btScalar angle_combined_finger1 = 0.3f;
+static const btScalar angle_combined_finger2 = -0.3f;
+static const btVector3 size_block = btVector3(1.0f, 3.0f, 1.0f);
+static const btVector3 pos_block = btVector3(0.0f, 3.5f, 0.0f);
+#endif
+#if (SCENARIO == 3)
+static const btVector3 pos_rigid_finger1 = btVector3(-2.5f, 3.0f, 0.0f);
+static const btVector3 pos_rigid_finger2 = btVector3(2.5f, 3.0f, 0.0f);
+static const btScalar angle_rigid_finger1 = 0.3f;
+static const btScalar angle_rigid_finger2 = -0.3f;
+static const btVector3 pos_combined_finger1 = btVector3(-3.5f, 3.0f, 0.0f);
+static const btVector3 pos_combined_finger2 = btVector3(3.5f, 3.0f, 0.0f);
+static const btScalar angle_combined_finger1 = 0.3f;
+static const btScalar angle_combined_finger2 = -0.3f;
+static const btVector3 size_block = btVector3(1.0f, 6.0f, 1.0f);
+static const btVector3 pos_block = btVector3(0.0f, 6.5f, 0.0f);
+#endif
+#if (SCENARIO == 4)
+static const btVector3 pos_rigid_finger1 = btVector3(-3.0f, 3.0f, 0.0f);
+static const btVector3 pos_rigid_finger2 = btVector3(3.0f, 3.0f, 0.0f);
+static const btScalar angle_rigid_finger1 = 0.3f;
+static const btScalar angle_rigid_finger2 = -0.3f;
+static const btVector3 pos_combined_finger1 = btVector3(-4.5f, 3.0f, 0.0f);
+static const btVector3 pos_combined_finger2 = btVector3(4.5f, 3.0f, 0.0f);
+static const btScalar angle_combined_finger1 = 0.3f;
+static const btScalar angle_combined_finger2 = -0.3f;
+static const btVector3 size_block = btVector3(1.0f, 6.0f, 6.0f);
+static const btVector3 pos_block = btVector3(0.0f, 6.5f, 0.0f);
+#endif
 
 #endif

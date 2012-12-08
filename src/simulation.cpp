@@ -43,11 +43,11 @@ void Simulation::init(bool useDeformable) {
     ground = new btRigidBody(groundInfo);
     
     // setup block
-    btCollisionShape *blockShape = new btBoxShape(btVector3(1.0f, 3.0f, 1.0f));
+    btCollisionShape *blockShape = new btBoxShape(size_block);
     
     btTransform blockTransform;
     blockTransform.setIdentity();
-    blockTransform.setOrigin(btVector3(0.0f,3.5f,0.0f));
+    blockTransform.setOrigin(pos_block);
     
     btScalar blockMass(0.01f);
     btVector3 blockLocalInertia(0,0,0);
@@ -65,8 +65,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform softFinger1Transform;
         softFinger1Transform.setIdentity();
-        softFinger1Transform.setOrigin(btVector3(-3.5,3,0));
-        softFinger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.0));
+        softFinger1Transform.setOrigin(pos_combined_finger1);
+        softFinger1Transform.setRotation(btQuaternion(btVector3(0,1,0), angle_combined_finger1));
         
         btScalar softFinger1Mass(1.0f);
         btVector3 softFinger1LocalInertia(0,0,0);
@@ -85,8 +85,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform softFinger2Transform;
         softFinger2Transform.setIdentity();
-        softFinger2Transform.setOrigin(btVector3(3.5,3,0));
-        softFinger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.0));
+        softFinger2Transform.setOrigin(pos_combined_finger2);
+        softFinger2Transform.setRotation(btQuaternion(btVector3(0,1,0), angle_combined_finger2));
         
         btScalar softFinger2Mass(1.0f);
         btVector3 softFinger2LocalInertia(0,0,0);
@@ -106,8 +106,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger1Transform;
         finger1Transform.setIdentity();
-        finger1Transform.setOrigin(btVector3(-2.5f,3,0.0f));
-        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), 0.0f));
+        finger1Transform.setOrigin(pos_rigid_finger1);
+        finger1Transform.setRotation(btQuaternion(btVector3(0,1,0), angle_rigid_finger1));
         
         btScalar finger1Mass(1.52f);
         btVector3 finger1LocalInertia(0,0,0);
@@ -124,8 +124,8 @@ void Simulation::init(bool useDeformable) {
         
         btTransform finger2Transform;
         finger2Transform.setIdentity();
-        finger2Transform.setOrigin(btVector3(2.5f,3,0.0f));
-        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), -0.0f));
+        finger2Transform.setOrigin(pos_rigid_finger2);
+        finger2Transform.setRotation(btQuaternion(btVector3(0,1,0), angle_rigid_finger2));
         
         btScalar finger2Mass(1.52f);
         btVector3 finger2LocalInertia(0,0,0);
@@ -460,7 +460,7 @@ Simulation::CollisionResponse Simulation::collisionResolution(float timeStep, bt
     // normal force
     btScalar allowedPenetration = 0.1f;
     btScalar biasFactor = 0.3f;
-    btScalar bias;
+    btScalar bias = 0.0f;
     if ((contactDepth - allowedPenetration) < 0.0f) {
         bias = 0;
     }
@@ -723,11 +723,11 @@ void Simulation::predictUnconstrainedMotion(float timeStep) {
     if(useDeformable) {
         
 //        softFinger1->applyGravity(timeStep);
-        softFinger1->m_rigidBody->applyCentralForce(btVector3(20.0f, 10.0f, 0.0f));
+        softFinger1->m_rigidBody->applyCentralForce(btVector3(50.0f, 10.0f, 0.0f));
         softFinger1->integrateVelocities(timeStep);
         softFinger1->predictIntegratedTransform(timeStep, softFinger1->m_rigidBody->getInterpolationWorldTransform());
 //        softFinger2->applyGravity(timeStep);
-        softFinger2->m_rigidBody->applyCentralForce(btVector3(-20.0f, 10.0f, 0.0f));
+        softFinger2->m_rigidBody->applyCentralForce(btVector3(-50.0f, 10.0f, 0.0f));
         softFinger2->integrateVelocities(timeStep);
         softFinger2->predictIntegratedTransform(timeStep, softFinger2->m_rigidBody->getInterpolationWorldTransform());
 
@@ -759,13 +759,13 @@ void Simulation::integrateTransforms(float timeStep) {
         softFinger2->integrateTransforms(timeStep);
     } else {
         btVector3 fv1 = finger1->getLinearVelocity();
-        finger1->setLinearVelocity(btVector3(fv1.x() < 0 ? 0 : fv1.x(),fv1.y(),0));
+        finger1->setLinearVelocity(btVector3(fv1.x() < 0 ? 0 : fv1.x(), fv1.y(),0));
         finger1->setAngularVelocity(btVector3(0,0,0));
         finger1->predictIntegratedTransform(timeStep, predictedTrans);
         finger1->proceedToTransform(predictedTrans);
         
         btVector3 fv2 = finger2->getLinearVelocity();
-        finger2->setLinearVelocity(btVector3(fv2.x() > 0 ? 0 : fv2.x(),fv1.y(),0));
+        finger2->setLinearVelocity(btVector3(fv2.x() > 0 ? 0 : fv2.x(), fv1.y(),0));
         finger2->setAngularVelocity(btVector3(0,0,0));
         finger2->predictIntegratedTransform(timeStep, predictedTrans);
         finger2->proceedToTransform(predictedTrans);
