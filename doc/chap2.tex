@@ -1,9 +1,9 @@
 \chapter{Problem Analysis}
 \label{cha:problem_analysis}
 
-This thesis focuses on a concrete example scenario. This helps to understand the implications and advantages of the proposed method better. Also the obtained results are more easily compared against the traditional approach.
+This thesis focuses on a concrete example scenario. This helps to understand the implications and advantages of the proposed method better. Furthermore the obtained results are more easily compared against the traditional approach.
 
-A widely applicable scenario for modeling bones and soft tissue are fingers. The scenario used in this thesis involves two fingers grabbing onto and lifting block off the ground. The fingers are positioned on either side of the block in the model. While applying a continuous pressure onto the block the fingers are lifting it up from the ground and into the air. This is directly applicable to a number of different scenarios involving a robotic arm with attached fingers, which is supposed to pick up blocks and other objects off the ground.
+A widely applicable scenario for modeling bones and soft tissue are fingers. The scenario used in this thesis involves two fingers grabbing onto and lifting a block off the ground. The fingers are positioned on either side of the block in the model. While applying a continuous pressure onto the block the fingers are lifting it up from the ground and into the air. This is directly applicable to a number of different scenarios involving a robotic arm with attached fingers, which is supposed to pick up blocks and other objects off the ground.
 
 \begin{figure}[htb]
 \centering
@@ -13,11 +13,11 @@ A widely applicable scenario for modeling bones and soft tissue are fingers. The
 \end{figure}
 \footnotetext{http://www.yalescientific.org/2010/12/engineering-flexible-robotic-hands/}
 
-All this has to be possible to be simulated in real-time in order to be used in games and animations. The simulations also have to be robust against numerically instabilities. These are either caused by simple numerical or rounding errors or also by the fingers being slightly off the target when grabbing onto the block. Forces between the inner bone and outer tissue as well as forces between the tissue and other objects have to be modeled so a realistic result can be achieved. This is especially true for the friction caused by the tissue on the block, as otherwise the block would not be lifted up at all.
+In order to model these scenarios in games and animations, it has to be possible to simulate all these actions in real-time. The simulations also have to be robust against numerically instabilities. These are either caused by simple numerical or rounding errors or by the fingers being slightly off the target, when grabbing onto the block. Forces between the inner bone and outer tissue, as well as forces between the tissue and other objects have to be modeled, so a realistic result can be achieved. This is especially true for the friction caused by the tissue on the block, as otherwise the block would not be lifted up at all.
 
 Using a simple rigid body simulation for this is suboptimal. Both fingers and the block would be modeled as rigid bodies. Resolving all the resulting forces acting on the block can quickly get numerically unstable. The blocks can start to move and wiggle incorrectly until the results are no longer visually pleasing and physically plausible.
 
-The problem is further complicated when instead of a simple block any kind of round object like a cylinder would have to be picked up. This would require the fingers to touch the cylinder perfectly perpendicular and on the exact opposite points. Otherwise the pressure and the resulting forces would simply let the cylinder slip out in either front or the back. This is basically impossible to achieve numerically.
+The problem is further complicated when instead of a simple block an arbitrary round object like a cylinder would have to be picked up. This would require the fingers to touch the cylinder perfectly perpendicular and on the exact opposite points. Otherwise the pressure and the resulting forces would simply let the cylinder slip out in either the front or the back. This is basically impossible to achieve numerically.
 
 The way to traditionally solve this problem has been to use multiple rigid bodies to simulate  each finger to get a better grip on the object that is lifted up. This way complicates the simulations quite a bit as joints and many more blocks have to be simulated. However the problem of slowing increasing numerically instabilities would still occur and might still be very hard to handle efficiently.
 
@@ -26,8 +26,9 @@ Solving the problem with only deformable bodies is theoretically possible, howev
 Therefore the main requirements for the proposed technique of combining an inner core of rigid bodies with a soft layer of surrounding deformable material can be summarized as:
 
 \begin{enumerate}
-\item real-time simulation
-\item	low number of bodies
-\item only approximate orientation of the fingers relative to the block
-\item collision handling/force propagation inside the body between "bone" and "tissue"\item modeling friction between fingers and object
+\item Real-time Simulation
+\item Low Number of Simulated Entities
+\item Only Approximate Orientation of Finger Relative to Object
+\item Force Propagation Inside Body Between Tissue and Bone
+\item Friction Between Finger and Object
 \end{enumerate}

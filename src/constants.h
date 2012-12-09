@@ -7,7 +7,7 @@
 #define SCENARIO 4
 
 // the body type used - false = rigid, true = combined
-static const bool body_type = false;
+static const bool body_type = true;
 
 // the step size used for the simulation loop
 static const float stepSize = 0.001f;
@@ -30,6 +30,10 @@ static const float stiffness = 0.01f;
 
 // the friction factor used between two rigid bodies
 static const float rigid_friction = 0.5f;
+
+// the friction factors used for oriented particles
+static const float linear_friction = 0.5f;
+static const float angular_friction = 0.5f;
 
 #if (SCENARIO == 1)
 static const btVector3 pos_rigid_finger1 = btVector3(-2.5f, 3.0f, 0.0f);

@@ -1,26 +1,26 @@
 \chapter{Fundamentals}
 \label{cha:fundamentals}
 
-This section describes the fundamental building blocks of the algorithm described in this thesis. It provides a quick overview and explains of how the two different simulation techniques work. It does not describe in any way how the two different simulations might interact but instead it describes them in total isolation.
+This section describes the fundamental building blocks of the algorithm described in this thesis. It provides a quick overview and explains how the two different simulation techniques work in isolation. It does not describe in any way how the two different simulations might interact but instead it describes them in total isolation.
 
 \section{Rigid Body Simulations}
 \label{sec:rigid_body_simulations}
 
 The following section gives a short introduction to rigid bodies simulations largely based on work by Baraff in \cite{Baraff:1997uh} and \cite{Baraff:1997wq}. These notes also form the basis for the rigid body parts implemented as part of the demo application provided by this thesis.
 
-Rigid bodies simulations are very similar to simple particle simulations. Simple particles are modeled as infinitesimal point masses, rigid bodies are additionally defined by their dimension. This extension in space remains constant throughout the whole simulation. A rigid body can therefore be thought of as a set of many particles. When a force acts on any one of these point masses all the other connected masses in the rigid body are affected as well. Each point mass has a fixed mass $m_i$ and is located at a fixed position $r_i$ inside the system. The total mass of the rigid body is then simply the sum of all the point masses combined
+Rigid bodies simulations are very similar to simple particle simulations. Simple particles are modeled as infinitesimal point masses, rigid bodies are additionally defined by their dimension. This extension in space remains constant throughout the whole simulation. A rigid body can therefore be thought of as a set of many particles. When a force acts on any of these point masses all the other connected masses in the rigid body are affected as well. Each point mass has a fixed mass $m_i$ and is located at a fixed position $r_i$ inside the system. The total mass of the rigid body is then simply the sum of all the point masses combined:
 
 \begin{equation}
 M = \sum\limits_{i=1}^N m_i
 \end{equation}
 
-The position of the particles is defined relative to a local body coordinate system. The origin of coordinate system is the center of mass of the rigid body. The center of mass is calculated as 
+The position of the particles is defined relative to a local body coordinate system. The origin of the coordinate system is the center of mass the rigid body's mass. The center of mass is calculated as:
 
 \begin{equation}
 c = \frac{\sum m_i r_i}{M}
 \end{equation}
 
-In order to describe a rigid body simulation two variables are of central importance. First ly the position \(x(t)\) of the rigid body in space. Second is the orientation \(q(t)\)in space. Both these variables are defined in relation to the world coordinate system. There are two different approaches to model the orientation of the rigid body, either a rotation matrix $R(t)$ or a unit quaternion $q(t)$. In practice almost all cases unit quaternions are used for a number of reasons. One important aspect is the fact that quaternions do not suffer from gimbal lock like simple Euler angles do. Another aspect is that a quaternion consists of only 4 numbers instead of the 9 numbers required for a full rotation matrix. This second point leads to both easier and more efficient calculations, especially for interpolation and normalization.
+In order to describe a rigid body simulation two variables are of central importance. Firstly the position \(x(t)\) of the rigid body in space. The second is the orientation \(q(t)\)in space. Both these variables are defined in relation to the world coordinate system. There are two different approaches to model the orientation of the rigid body, either a rotation matrix $R(t)$ or a unit quaternion $q(t)$. In practice almost all cases, unit quaternions are used for a number of reasons. One important aspect is the fact that quaternions do not suffer from gimbal lock like simple Euler angles do. Another aspect is that a quaternion consists of only 4 numbers instead of the 9 numbers required for a full rotation matrix. This second point leads to both easier and more efficient calculations, especially for interpolation and normalization.
 
 \begin{figure}[htb]
 \centering
@@ -29,17 +29,17 @@ In order to describe a rigid body simulation two variables are of central import
 \label{img:rigid_body}
 \end{figure}
 
-By definition only the affine transformations of rotation and translation can apply to any rigid body. The main task of the rigid body simulation therefore is to calculate these to variables over time \(t\).
+By definition only the affine transformations of rotation and translation can apply to any rigid body. The main task of the rigid body simulation therefore is to calculate these two variables over time \(t\).
 
 The physics behind the rigid body simulation is based on Newton's laws of motion. Most importantly the first law stating that if no force acts on an object, the velocity of the object will remain constant. Thus follows that the simulation has to model all forces acting on the body. These forces are the only causes for a change in the body's state and thus its position and orientation in space. The forces either cause a change in the linear velocity of the body, or an angular velocity results in a rotation of the body. 
 
-The position of the rigid body is defined by the position $x(t)$ of its center of mass in world coordinates over time. The change of this position over time defines the linear velocity $v(t)$ for the body. So the linear velocity is simply the following.
+The position of the rigid body is defined by the position $x(t)$ of its center of mass in world coordinates over time. The change of this position over time defines the linear velocity $v(t)$ for the body. So the linear velocity is simply the following:
 
 \begin{equation}
 v(t) = \dot{x}(t)
 \end{equation}
 
-The angular velocity is a more difficult to define. First the current rotation of the body has to be stated. The orientation of the rigid body was defined as unit quaternion $q(t)$. The change in orientation can then be calculated using the following
+The angular velocity is a more difficult to define. First the current rotation of the body has to be stated. The orientation of the rigid body was defined as unit quaternion $q(t)$. The change in orientation can then be calculated using the following:
 
 \begin{equation}
 \dot{q}(t) = \omega(t) * q(t)
@@ -47,7 +47,7 @@ The angular velocity is a more difficult to define. First the current rotation o
 
 Here $\omega(t)$ denotes the angular velocity of the body at any point in time. Both the linear velocity and the angular velocity are integrated in every time step to simulate the body's behavior.
 
-So in its most basic form the state of a rigid body body is defined by just the following five variables
+This mean, that the state of a rigid body in its most basic form is defined by just the following five variables:
 
 \begin{align*}
 m &, \text{the mass} \\
@@ -57,15 +57,15 @@ v &, \text{the linear velocity} \\
 \omega &, \text{the angular velocity} \\
 \end{align*}
 
-Until now only the state of the rigid body has been defined. In the real world forces are acting upon the body which cause a change in its state according to Newton's laws of motion. The most prominent forces usually modeled in a rigid body simulation are for example gravity, collision and friction. In the real world forces always act over a defined amount of time. Unfortunately for the simulation an instantaneous change in velocity is more desirable, so that for example in the case of collision the relative velocity of the involved bodies comes to a hold immediately. In order to achieve this goal the new quantity $J$ is introduced. $J$ is called an impulse and represents a force integrated over time.
+Until now only the state of the rigid body has been defined. In the real world forces are acting upon the body, which cause a change in its state according to Newton's laws of motion. The most prominent forces usually modeled in a rigid body simulation are for example gravity, collision and friction. In the real world forces always act over a defined amount of time. Unfortunately for the simulation an instantaneous change in velocity is more desirable, so that for example in the case of collision the relative velocity of the involved bodies comes to a hold immediately. In order to achieve this goal, the new quantity $J$ is introduced. $J$ is called an impulse and represents a force integrated over time.
 
 \begin{equation}
 F \Delta t = J
 \end{equation}
 
-Letting $F$ go to infinity and $\Delta t$ to zero describes how the force would change the velocity if it would caused an immediate change. $J$ thus has the units of momentum. 
+Letting $F$ go to infinity and $\Delta t$ to zero describes how the force would change the velocity as if it caused an immediate change. $J$ thus has the units of momentum. 
 
-Again the effects of any impulse have to be evaluated for both the linear velocity as well as for the angular velocity. For the linear velocity the change is rather defined as
+The effects of any impulse have to be evaluated for both the linear velocity as well as for the angular velocity. For the linear velocity the change is rather defined as
 
 \begin{equation}
 v(t) = \frac{P(t)}{M}
@@ -73,7 +73,7 @@ v(t) = \frac{P(t)}{M}
 
 In this case $P(t)$ denotes the linear momentum aggregated across all force acting upon the body and $M$ is simply the mass of the rigid body.
 
-The formula for the angular velocity again is slightly more involved
+The formula for the angular velocity is slightly more involved
 
 \begin{equation}
 \omega(t) = L(t) * inv(I(t))
@@ -121,7 +121,7 @@ The main concept of this deformable model is to replace the system of forces and
 \label{img:shape_matching}
 \end{figure}
 
-The algorithm only takes a set of particles and their initial configuration as inputs. Each particle has four variables
+The algorithm only takes a set of particles and their initial configuration as inputs. Each particle has four variables:
 
 \begin{align*}
 m_i &, \text{the mass} \\
@@ -164,7 +164,7 @@ The next insight is to actually find the optimal linear transformation \(A\) ins
 A = (\sum_i m_i p_i q_i^\top)(\sum_i m_i q_i q_i^\top)^{-1}=A_{pq}A_{qq}
 \end{equation}
 
-\(A_{qq}\) is a symmetric matrix and therefore contains no rotational part. All the rotation is encapsulated in \(A_{pp}\). The optimal rotation matrix can now be found by calculating the polar decomposition \(A = RS\). This allows to finally write down the goal position for each particle as
+\(A_{qq}\) is a symmetric matrix and therefore contains no rotational part. All the rotation is encapsulated in \(A_{pp}\). The optimal rotation matrix can now be found by calculating the polar decomposition \(A = RS\). This allows to finally write down the goal position for each particle as:
 
 \begin{equation}
 g_i = R(\bar{x}_i - \bar{c}) + c
@@ -175,7 +175,7 @@ All particles are then moved to their respective goal positions by a variable fr
 \section{Position Based Dynamics}
 \label{sec:position_based_dynamics}
 
-Position based dynamics is a method which omits the traditional force based approach used in simulating dynamics systems but instead directly works on the positions to simulate deformable objects and was proposed by M{\"u}ller et al. in \cite{Muller:2007vs}. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. However, instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. Also as the name implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the pseudocode of the simulation loop.
+Position based dynamics (PBD) is a method which omits the traditional force based approach used in simulating dynamics systems but instead directly works on the positions to simulate deformable objects and was proposed by M{\"u}ller et al. in \cite{Muller:2007vs}. This means it also is not physically correct but instead provides an efficient unconditionally stable simulation. Like shape matching it also tries to satisfy constraints in order to arrive at stable end positions. However, instead of one global constraint, the shape, position based dynamics handles many different constraints. These constraints either model the physical properties of the object and are thus fixed throughout the simulation, or are generated on demand in the case of collision constraints used to resolve collisions. As the name also implies position based dynamics only works with the position of the particles updating them directly. The velocity of the particle is solely determined by the difference in positions overtime. This is best illustrated by the pseudocode of the simulation loop.
 
 \begin{algorithm}[htb]
 \caption{Position Based Dynamics Simulation Loop}
@@ -200,7 +200,7 @@ Position based dynamics is a method which omits the traditional force based appr
 \end{algorithmic}
 \end{algorithm}
 
-The first key insight into the algorithm occurs in lines 9-11. Here positions for all vertices are estimated using the current velocity and the time step. This step is completely unrestricted and just predicts and estimates a position which is then later redefined. Line 15-17 illustrate this refinement. A Gauss-Seidel type iteration is used to satisfy all constraints defined for the system. These constraints mostly model the inherent structure of object currently simulated but another important aspect handled here are collisions, which are just another constraint for the system and generated in each time step after estimating the position. The idea is to iterate over all constraints multiple times so that the particles are projected to valid locations with respect to the given constraint. The final vital piece of the algorithm can be seen in lines 18-21. After all constraints have been satisfied as good as possible the estimated positions alone are used to update the state of all vertices. The velocity of the particle is solely calculated by the difference of the new estimated position and the former position. This integration scheme is unconditionally stable as it does not just extrapolate into the future like traditional explicit schemes do. Instead it uses the physically valid positions computed with the constraint solver.
+The first key insight into the algorithm occurs in lines 9-11. Here positions for all vertices are estimated using the current velocity and the time step. This step is completely unrestricted and just predicts and estimates a position which is then later redefined. Line 15-17 illustrate this refinement. A Gauss-Seidel type iteration is used to satisfy all constraints defined for the system. These constraints mostly model the inherent structure of the object currently simulated but another important aspect handled here are collisions, which are just another constraint for the system and generated in each time step after estimating the position. The idea is to iterate over all constraints multiple times so that the particles are projected to valid locations with respect to the given constraint. The final vital piece of the algorithm can be seen in lines 18-21. After all constraints have been satisfied as good as possible the estimated positions alone are used to update the state of all vertices. The velocity of the particle is solely calculated by the difference of the new estimated position and the former position. This integration scheme is unconditionally stable as it does not just extrapolate into the future like traditional explicit schemes do. Instead it uses the physically valid positions computed with the constraint solver.
 
 \clearpage
 \section{Oriented Particles}
@@ -209,14 +209,14 @@ The first key insight into the algorithm occurs in lines 9-11. Here positions fo
 \begin{figure}[htb]
 \centering
 \includegraphics[width=.8\textwidth]{images/oriented_particles_illustration.png}
-\caption{Oriented particle illustration}
+\caption[Oriented particle illustration]{Oriented particle illustration\cite{Muller:2011gn}}
 \label{img:oriented_particles_illustration}
 \end{figure}
 
-Oriented particles as described by M{\"u}ller et al. \cite{Muller:2011gn} combines the geometrical based approach of shape matching with the idea of updating the velocities based on the positions alone as described in position based dynamics. They specifically improve upon shape matching in sparse regions increasing the overall stability of the shape matching. Modeling the particles as oriented ellipsoids can approximate the surface more accurately than simple sphere which is especially useful in calculating and resolving collisions.
+Oriented particles as described by M{\"u}ller et al. \cite{Muller:2011gn} combine the geometrical based approach of shape matching with the idea of updating the velocities based on the positions alone as described in position based dynamics. They specifically improve upon shape matching in sparse regions increasing the overall stability of the shape matching. Modeling the particles as oriented ellipsoids can approximate the surface more accurately than simple sphere, which is especially useful in calculating and resolving collisions.
 
 \subsection{Generalized Shape Matching}
-The main idea is to use oriented particles that in addition to the position and velocity also store rotation and spin. The particles now all have orientation information associated with them, thus the name of the method. The variables for each particle are thus now extended to encompass the following seven variables.
+The main idea is to use oriented particles which also store rotation and spin, in addition to the position and velocity. The particles now all have orientation information associated with them, thus the name of the method. The variables for each particle are thus extended to encompass the following seven variables:
 
 \begin{align*}
 m_i &, \text{the mass} \\
@@ -233,7 +233,7 @@ The advantages of including orientations for each particle become particularly e
 \begin{figure}[htb]
 \centering
 \includegraphics[width=.5\textwidth]{images/oriented_particle_twist_chain.png}
-\caption{Oriented particle twisting chain}
+\caption[Oriented particle twisting chain]{Oriented particle twisting chain\cite{Muller:2011gn}}
 \label{img:oriented_particle_twist_chain}
 \end{figure}
 
@@ -246,7 +246,7 @@ A = \sum\limits_i^n m_i(x_i-c)(\bar{x}_i - \bar{c})^\top  \in \mathbb{R}^{3x3}
 
 This moment matrix $A$ in terms of $n$ particles each with a corresponding mass $m_i$ and current position $x_i$. The center of mass for the current configuration is defined as $c$. Analog to that the rest position is defined as $\bar{x}_i$ and the rest center of mass as $\bar{c}$. Both center of mass are calculated using the traditional approach as seen in equation \ref{eq:center_of_mass_shape_matching}.
 
-As in the original shape matching the goal is to find the optimal translation vector $t$ and rotation matrix $R$, which map the original shape to the current configuration in a least squares manner. The optimal translation vector can simply be calculated from the differences of the two centers of mass.
+Just like in the original shape matching approach the goal is to find the optimal translation vector $t$ and rotation matrix $R$, which map the original shape to the current configuration in a least squares manner. The optimal translation vector can simply be calculated from the differences of the two centers of mass.
 
 \begin{equation}
 t = c - \bar{c}
@@ -285,10 +285,10 @@ $A_i$ denotes the moment matrix for a single particle in the group while the oth
 A = \sum\limits_i^n (A_i + m_ix_i\bar{x}_i^\top) - Mc\bar{c}^\top
 \end{equation}
 
-Integrating the equation \ref{eq:minimize_oriented_particle} over the particle's volume yields the moment matrix for a single particle. Each particle is modeled as an ellipsoid so their moment matrix is defined in terms of their radii and rotation.
+Integrating the equation \ref{eq:minimize_oriented_particle_1} over the particle's volume yields the moment matrix for a single particle. Each particle is modeled as an ellipsoid so their moment matrix is defined in terms of their radii and rotation.
 
 \begin{equation}
-%A_{\text{ellipsoid}} = \frac{1}{5}m \begin{bmatrix} a^2 & 0 & 0 \\ 0 & b^2 & 0 \\ 0 & 0 & c^2  \end{bmatrix} R
+A_{\text{ellipsoid}} = \frac{1}{5}m \begin{bmatrix} a^2 & 0 & 0 \\ 0 & b^2 & 0 \\ 0 & 0 & c^2  \end{bmatrix} R
 \end{equation}
 
 The radii of a single particle are simply defined by the length of the semi-axes $r = [a,b,c]^\top$ in all orthonormal directions. Including the orientation $R$ for each single particle causes the total moment matrix $A$ to always be full ranked and thus the polar decomposition to return more reliable results.
@@ -296,14 +296,14 @@ The radii of a single particle are simply defined by the length of the semi-axes
 Having defined a stable moment matrix for each group the optimal translation vector and rotation matrix can be obtained and thus the goal positions can be calculated. Again analog to the original shape matching the particles are pulled towards their goal positions by a variable stiffness fraction. However the oriented particles' way of integrating the position and velocities of the particles is completely different from the way the traditional shape matching method works. Instead the oriented particles are updated and integrated by a system closely modeled after the position based dynamics' approach but extended by integrating the orientations of the particles.
 
 \subsection{Generalized Position Based Dynamics}
-As in Position Based Dynamics (PBD) the first step is the prediction step. Here a new predicted position $x_p$ is calculated for each particle using a simple integration scheme. However for oriented particles the associated orientation $q_p$ of each particle also has to be predicted over time. This prediction step using an explicit Euler integration looks like the following.
+As in Position Based Dynamics (PBD) the first step is the prediction step. Here a new predicted position $x_p$ is calculated for each particle using a simple integration scheme. However for oriented particles the associated orientation $q_p$ of each particle also has to be predicted over time. This prediction step using an explicit Euler integration looks like the following:
 
 \begin{align}
 x_p &\leftarrow x + v\Delta t \\
 q_p &\leftarrow [\frac{\omega}{|\omega|}sin(\frac{|\omega|\Delta t}{2}), cos(\frac{|\omega|\Delta t}{2})]q
 \end{align}
 
-Now the solver has calculated a predicated state $(x_p,q_p)$ for each single particle. This information is then based onto the second step. The second step is simply the adaptation and modification of the predicted state according to the rules laid out by the generalized shape matching approach outlined above. The last and final step is to integrate the state for each particle. In accordance with PBD but in difference to shape matching the integration step only takes in the particle's state in the beginning of the iteration and the adjusted predicted state. This way, like in PBD, calculating the velocities is solely based on the positions and orientations provides an unconditionally stable scheme as the adjusted predictions never overshoot. The integration step thus becomes the following equations.
+Now the solver has calculated a predicated state $(x_p,q_p)$ for each single particle. This information is then based onto the second step. The second step is simply the adaptation and modification of the predicted state according to the rules laid out by the generalized shape matching approach outlined above. The last and final step is to integrate the state for each particle. In accordance with PBD but in difference to shape matching the integration step only takes in the particle's state in the beginning of the iteration and the adjusted predicted state. This way, like in PBD, calculating the velocities is solely based on the positions and orientations provides an unconditionally stable scheme as the adjusted predictions never overshoot. The integration step thus becomes the following equations:
 
 \begin{align}
 v &\leftarrow (x_p - x)/\Delta t \\
@@ -337,18 +337,19 @@ Another improvement oriented particles provide is a more accurate collision hand
 		\includegraphics[width=.3\textwidth]{oriented_particles_collision_ellipsoid_correct.pdf}
 		\label{subfig:collision_ellipsoid_correct}
 	}
+	\caption{Particle collision handling}
 	\label{fig:collision_handling}
 \end{figure}
 
-Ellipsoids can fit to the surface area of a model better than simplistic spheres can. Using spheres might cause unnatural frictions or other visual artifacts. The question now remains how to calculate the correct spot on the surface of the ellipsoid that collided with a plane as can be seen in figure \ref{subfig:collision_ellipsoid_correct}. The simplistic approach used in the spherical case cannot directly be transferred as illustrated in figure \ref{subfig:collision_sphere} and \ref{subfig:collision_ellipsoid_incorrect}. This would only work if the contact normal was aligned to the principal axis of the ellipsoid. However, in almost all cases this is not the case and the calculation becomes a little bit more involved.
+Ellipsoids can fit to the surface area of a model better than simplistic spheres can. Using spheres might cause unnatural frictions or other visual artifacts. The question now remains how to calculate the correct spot on the surface of the ellipsoid that collided with a plane as can be seen in figure \ref{subfig:collision_ellipsoid_correct}. The simplistic approach used in the spherical case cannot directly be transferred as illustrated in figure \ref{subfig:collision_sphere} and \ref{subfig:collision_ellipsoid_incorrect}. This would only work if the contact normal was aligned to the principal axis of the ellipsoid. However, in almost all cases this is not true and the calculation becomes a little bit more involved.
 
-Each potential particle is defined by its principal radii $a,b,c$ and its rotation matrix $R$. The potential collision plane is simply defined in hessian form as $p = n^\top x=d$. The first step is to compute the contact point on the surface of the ellipsoid with a normal that is parallel to the normal of the plane $n$. In general the ellipsoid can be defined in terms of the following zero iso-surface.
+Each potential particle is defined by its principal radii $a,b,c$ and its rotation matrix $R$. The potential collision plane is simply defined in hessian form as $p = n^\top x=d$. The first step is to compute the contact point on the surface of the ellipsoid with a normal that is parallel to the normal of the plane $n$. In general the ellipsoid can be defined in terms of the following zero iso-surface:
 
 \begin{equation}
 c(x) = x^\top A x - 1
 \end{equation}
 
-The potential contact point has to meet the following two constraints
+The potential contact point has to meet the following two constraints:
 
 \begin{align}
 \nabla c(x)&=\lambda n \\
@@ -359,16 +360,16 @@ In addition to these two constraints the following two formulas yield enough inf
 
 \begin{align}
 \nabla c(x)&=2 A x \\
-%A = R \begin{bmatrix}\frac{1}{a^2} & 0 & 0 \\ 0 & \frac{1}{b^2} & 0 \\ 0 & 0 & \frac{1}{c^2}\end{bmatrix} R^\top &\Rightarrow A^{-1} = R \begin{bmatrix}a^2 & 0 & 0 \\ 0 & b^2 & 0 \\ 0 & 0 & c^2\end{bmatrix}R^\top
+A = R \begin{bmatrix}\frac{1}{a^2} & 0 & 0 \\ 0 & \frac{1}{b^2} & 0 \\ 0 & 0 & \frac{1}{c^2}\end{bmatrix} R^\top &\Rightarrow A^{-1} = R \begin{bmatrix}a^2 & 0 & 0 \\ 0 & b^2 & 0 \\ 0 & 0 & c^2\end{bmatrix}R^\top
 \end{align}
 
-Thus $\lambda$ and $x$ can be calculated in the following manner.
+Thus $\lambda$ and $x$ can be calculated in the following manner:
 
 \begin{align}
 \lambda &= \pm \frac{2}{\sqrt{n^\top A^{-1} n}} \\
 x &= \pm \frac{A^{-1}n}{\sqrt{n^\top A^{-1} n}}
 \end{align}
 
-These calculations always lead to two possible positions $x$ on the surface of ellipsoid, which have a normal parallel to the plane normal. The correct point to choose is always the point which is closer the plane, this can easily be calculated given the hessian form of the plane. The final step to determine if a collision between the current particle and the plane has occurred is to check if the contact point is below the plane and thus satisfies the condition $n^\top x < d$. Solving this condition also automatically returns the penetration depth of the collision. The depth can directly be utilized to modify the predicted position of particle. The collision detection and resolution step is done for all particles after the positions have been predicted but before the shape matching. Although the collision step should ideally be calculated for every iteration, using Gauss-Seidel, of the shape matching, this is way too expensive as the number of particles and planes can get quite large very quickly. However, just resolving the collisions once before shape matching seems to give satisfactory results.
+These calculations always lead to two possible positions $x$ on the surface of the ellipsoid, which have a normal parallel to the plane normal. The correct point to choose is always the point which is closer the plane. This can easily be calculated given the hessian form of the plane. The final step to determine if a collision between the current particle and the plane has occurred is to check if the contact point is below the plane and thus satisfies the condition $n^\top x < d$. Solving this condition also automatically returns the penetration depth of the collision. The depth can directly be utilized to modify the predicted position of particle. The collision detection and resolution step is done for all particles after the positions have been predicted but before the shape matching. Although the collision step should ideally be calculated for every iteration, using Gauss-Seidel, of the shape matching, this is way too expensive as the number of particles and planes can get quite large very quickly. However, just resolving the collisions once before shape matching seems to give satisfactory results.
 
 The oriented particles paper describes a couple of additional features for the simulation with oriented particles. These include explicit shape matching groups defined manually, plastic deformation which cause the rest state to change, friction, torsion resistance, stretching and bending, collision handling between two ellipsoids and using the orientation information for more efficient skinning. However, these features are not needed to achieve the goals and requirements of this thesis and are thus not described here. More details can be found in the original paper.

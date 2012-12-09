@@ -139,9 +139,6 @@ void Simulation::init(bool useDeformable) {
     }
 }
 
-static btVoronoiSimplexSolver sGjkSimplexSolver;
-btSimplexSolverInterface& gGjkSimplexSolver = sGjkSimplexSolver;
-
 void Simulation::step(float timeStep) {
 	predictUnconstrainedMotion(timeStep);
 	
@@ -197,7 +194,7 @@ void Simulation::realignAttachedParticles(float timeStep, CombinedBody *body) {
     for(int i = 0; i < body->m_attachedParticles.size(); i++) {
         Particle *particle = body->m_attachedParticles.at(i);
         
-        btTransform bodyTransform = body->m_rigidBody->getWorldTransform();
+        btTransform bodyTransform = body->m_rigidBody->getInterpolationWorldTransform();
         btVector3 truePosition = bodyTransform * particle->relativePosition;
         
         btVector3 particlePosition = particle->predictedPosition;
@@ -294,6 +291,17 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
     {
         Particle *particle = body->m_outerParticles.at(i);
         
+        short finger = body->m_rigidBody->getCenterOfMassPosition().x() < 0 ? 1 : 2;
+        if(finger == 1) {
+            if ((particle->predictedPosition - body->m_rigidBody->getCenterOfMassPosition()).x() < 0) {
+                continue;
+            }
+        } else if (finger == 2) {
+            if ((particle->predictedPosition - body->m_rigidBody->getCenterOfMassPosition()).x() > 0) {
+                continue;
+            }
+        }
+        
         btMatrix3x3 R = btMatrix3x3(particle->predictedOrientation);
         btMatrix3x3 AInv = R * particle->radiiMatrix * R.transpose();
         
@@ -339,16 +347,21 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
 
                     CollisionResponse res = collisionResolution(timeStep, x1, n, (d-d1), particle->predictedPosition, t.getOrigin(), particle->linearVelocity, block->getLinearVelocity(), particle->angularVelocity, block->getAngularVelocity(), 1/particle->mass, block->getInvMass(), particle->getInvInertiaTensorWorld(), block->getInvInertiaTensorWorld());
                     
-                    particle->linearVelocity += res.normal1_linear;
-                    particle->angularVelocity += res.normal1_angular;
+//                    btVector3 bodyVelocity = getVelocityAtSurfacePoint(x1, t.getOrigin(), block->getLinearVelocity(), block->getAngularVelocity());
+//                    
+//                    btVector3 deltaV = (bodyVelocity - particle->linearVelocity);
+//                    btScalar alpha = deltaV.dot(n);
+//                    btVector3 perpV = deltaV - alpha*n;
+//                    particle->linearVelocity += perpV * linear_friction;
+//                    
+//                    btVector3 r = particle->radii * n;
+//                    particle->angularVelocity += (r/r.length2()).cross(bodyVelocity - particle->linearVelocity - particle->angularVelocity.cross(r)) * angular_friction;
+                    
                     block->setLinearVelocity(block->getLinearVelocity() - res.normal2_linear);
                     block->setAngularVelocity(block->getAngularVelocity() - res.normal2_angular);
                     
-                    particle->linearVelocity += res.friction1_linear;
-                    particle->angularVelocity += res.friction1_angular;
                     block->setLinearVelocity(block->getLinearVelocity() - res.friction2_linear);
                     block->setAngularVelocity(block->getAngularVelocity() - res.friction2_angular);
-                    block->applyImpulse((particle->mass * -delta) / timeStep, t.getOrigin() - x1);
                 }
             } else {
                 if (blockShape->isInside(bodyX2, margin)) {
@@ -358,13 +371,19 @@ void Simulation::softCollisionWithBlock(float timeStep, CombinedBody *body) {
                     
                     CollisionResponse res = collisionResolution(timeStep, x2, n, (d-d2), particle->predictedPosition, t.getOrigin(), particle->linearVelocity, block->getLinearVelocity(), particle->angularVelocity, block->getAngularVelocity(), 1/particle->mass, block->getInvMass(), particle->getInvInertiaTensorWorld(), block->getInvInertiaTensorWorld());
                     
-                    particle->linearVelocity += res.normal1_linear;
-                    particle->angularVelocity += res.normal1_angular;
+//                    btVector3 bodyVelocity = getVelocityAtSurfacePoint(x2, t.getOrigin(), block->getLinearVelocity(), block->getAngularVelocity());
+//                    
+//                    btVector3 deltaV = (bodyVelocity - particle->linearVelocity);
+//                    btScalar alpha = deltaV.dot(n);
+//                    btVector3 perpV = deltaV - alpha*n;
+//                    particle->linearVelocity += perpV * linear_friction;
+//                    
+//                    btVector3 r = particle->radii * n;
+//                    particle->angularVelocity += (r/r.length2()).cross(bodyVelocity - particle->linearVelocity - particle->angularVelocity.cross(r)) * angular_friction;
+
                     block->setLinearVelocity(block->getLinearVelocity() - res.normal2_linear);
                     block->setAngularVelocity(block->getAngularVelocity() - res.normal2_angular);
                     
-                    particle->linearVelocity += res.friction1_linear;
-                    particle->angularVelocity += res.friction1_angular;
                     block->setLinearVelocity(block->getLinearVelocity() - res.friction2_linear);
                     block->setAngularVelocity(block->getAngularVelocity() - res.friction2_angular);
                 }
@@ -443,6 +462,14 @@ void Simulation::collision(float timeStep) {
        }
     }
 }
+                                      
+btVector3 Simulation::getVelocityAtSurfacePoint(btVector3 surfacePoint, btVector3 centerPoint, btVector3 linearVelocity, btVector3 angularVelocity) {
+    
+    btVector3 r = surfacePoint - centerPoint;
+    btVector3 v = linearVelocity + (angularVelocity.cross(r));
+    
+    return v;
+}
 
 Simulation::CollisionResponse Simulation::collisionResolution(float timeStep, btVector3 contactPoint, btVector3 contactNormal, btScalar contactDepth, btVector3 p1, btVector3 p2, btVector3 v1, btVector3 v2, btVector3 a1, btVector3 a2, btScalar invM1, btScalar invM2, btMatrix3x3 invT1, btMatrix3x3 invT2) {
     
@@ -451,8 +478,8 @@ Simulation::CollisionResponse Simulation::collisionResolution(float timeStep, bt
     btVector3 r1 = contactPoint - p1;
     btVector3 r2 = contactPoint - p2;
     
-    btVector3 rv1 = v1 + (a1.cross(r1));
-    btVector3 rv2 = v2 + (a2.cross(r2));
+    btVector3 rv1 = getVelocityAtSurfacePoint(contactPoint, p1, v1, a1);
+    btVector3 rv2 = getVelocityAtSurfacePoint(contactPoint, p2, v2, a2);
     
     btScalar vrel = contactNormal.dot(rv1 - rv2);
     

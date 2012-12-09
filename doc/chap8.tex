@@ -1,4 +1,4 @@
-\chapter{Conclusions}
+\chapter{Conclusion}
 \label{cha:conclusions}
 
 This thesis presented a method to simulate both rigid bodies and deformable particles together in one single model. It combined a rigid inner bone with a soft outer tissue. The tissue is able to deform around other rigid bodies in the world and thus increase the contact area enabling more robust simulations. The method extends the oriented particles approach in various ways. Two types of interface between rigid bodies and oriented particles were defined. The collision interfaces between oriented particles and rigid bodies on the outside of body was resolved, including friction acting on the rigid body. The second interface is inside the combined body itself where the forces caused by the moving tissue were propagated to the inner bone. Finally various demo scenarios showed how the method is able to robustly simulate picking up a small object.
@@ -9,4 +9,4 @@ Furthermore the collision between two combined bodies has been completely omitte
 
 Another interesting topic for further investigating is the automatic distribution of particles both across the surface of the inner bone as well as across the overall structure of the tissue. The current implementation is limited to a simple box shaped bone with a rather simplistic outer tissue. Extending this to handle more complex bone structures would provide more realistic simulations.
 
-The current demo application also suffers from some performance issues as it was only implemented as a proof of concept. Many performance improvements can be implemented easily. The original oriented particles paper has already proven the real-time characteristics of this type of particle simulation. There is no reason that the additions introduced in this thesis will hinder this requirement in any way
+The current demo application also suffers from some performance issues as it was only implemented as a proof of concept. Many performance improvements can be implemented easily. The original oriented particles paper has already proven the real-time characteristics of this type of particle simulation. There is no reason that the additions introduced in this thesis will hinder this requirement in any way.
